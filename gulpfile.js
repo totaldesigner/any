@@ -3,7 +3,9 @@
 var gulp = require('gulp');
 var browserSync = require('browser-sync');
 var mocha = require('gulp-mocha');
+var cssmin = require('gulp-cssmin');
 var mochaPhantomJS = require('gulp-mocha-phantomjs');
+var uglify = require('gulp-uglify');
 var util = require('gulp-util');
 
 // Load plugins
@@ -27,6 +29,8 @@ gulp.task('styles', function () {
         browsers: browsers
       })
     ]))
+    .pipe(concat('any.css'))
+    .pipe(cssmin())
     .pipe(gulp.dest('dist/css'))
     .pipe(browserSync.reload({stream: true}));
 });
@@ -36,6 +40,7 @@ var concat = require('gulp-concat');
 gulp.task('scripts', function () {
   return gulp.src('src/js/*.js')
     .pipe(concat('any.js'))
+    .pipe(uglify())
     .pipe(gulp.dest('dist/js'));
 });
 
