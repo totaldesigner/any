@@ -56,7 +56,7 @@ describe('test any.js', function () {
 
     list.removeAt(2);
 
-    list.update(1, {
+    list.update(0, {
       name: 'mspark7'
     });
   });

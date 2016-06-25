@@ -182,13 +182,14 @@ any = (function () {
 
   /**
    * controls
-   * @type {{List, Layout, Layer}}
-   */
+   * @type {{ListView, Layout, Layer, Page}}
+     */
   controls = (function () {
     /**
      * Control
+     * @param className
      * @constructor
-     */
+       */
     function Control(className) {
       var self = this, element;
       element = document.createElement('div');
@@ -219,11 +220,20 @@ any = (function () {
       }
     };
 
+    /**
+     * Item
+     * @constructor
+       */
     function Item() {
 
     }
     Item.prototype = new Control();
 
+    /**
+     * ListViewItem
+     * @param className
+     * @constructor
+       */
     function ListViewItem(className) {
       var self = this, element;
       element = document.createElement('li');
@@ -236,48 +246,12 @@ any = (function () {
       self.element.appendChild(child);
     };
 
-    //function View(className, list, itemTemplate) {
-    //  var self = this;
-    //  Control.call(self, className);
-    //  if (list) {
-    //    list.addEventListener('ItemAdded', function (e) {
-    //      self.onItemAdded(e);
-    //    });
-    //    list.addEventListener('ItemRemoved', function (e) {
-    //      self.onItemRemoved(e);
-    //    });
-    //    list.addEventListener('ItemUpdated', function (e) {
-    //      self.onItemUpdated(e);
-    //    });
-    //    self.itemTemplate = itemTemplate;
-    //    self.list = list;
-    //  }
-    //}
-    //
-    //View.prototype = new Control();
-    //View.prototype.draw = function () {
-    //  var self = this, list = self.list, itemTemplate = self.itemTemplate;
-    //  self.empty();
-    //  for (var i = 0, l = list.length; i < l; i++) {
-    //    self.drawChild(itemTemplate(list[i]));
-    //  }
-    //};
-    //View.prototype.drawChild = function(child) {
-    //  var self = this;
-    //  child.className = self.className + '-item';
-    //  self.element.appendChild(child);
-    //};
-    //View.prototype.onItemAdded = null;
-    //View.prototype.onItemRemoved = null;
-    //View.prototype.onItemUpdated = null;
-
-    /**
-     * List
-     * @param element
-     * @param list
-     * @param itemTemplate
-     * @constructor
-     */
+      /**
+       * ListView
+       * @param list
+       * @param itemTemplate
+       * @constructor
+       */
     function ListView(list, itemTemplate) {
       var self = this, element;
       self.className = CLASS_NAME.LIST_VIEW;
@@ -334,10 +308,14 @@ any = (function () {
         child = document.querySelector('.' + self.className + '-item:nth-child(' + (index + 1) + ')');
         item = new ListViewItem(self.className + '-item');
         item.draw(self.itemTemplate(args.item));
-        self.element.appendChild(item.element);
+        self.element.replaceChild(item.element, child);
       }
     };
 
+    /**
+     * Layout
+     * @constructor
+       */
     function Layout() {
       var self = this;
       Control.call(self, CLASS_NAME.LAYOUT);
@@ -345,6 +323,10 @@ any = (function () {
 
     Layout.prototype = new Control();
 
+    /**
+     * Layer
+     * @constructor
+       */
     function Layer() {
       var self = this;
       Control.call(self, CLASS_NAME.LAYER);
@@ -358,6 +340,10 @@ any = (function () {
       self.parent = parent;
     }
 
+    /**
+     * Page
+     * @type {Control}
+       */
     Page.prototype = new Control();
     Page.prototype.draw = function() {
       var self = this;
