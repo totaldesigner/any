@@ -219,9 +219,71 @@ any = (function () {
       }
     };
 
-    function View(className, list, itemTemplate) {
+    function Item() {
+
+    }
+    Item.prototype = new Control();
+
+    function ListViewItem(className) {
+      var self = this, element;
+      element = document.createElement('li');
+      element.className = className;
+      self.element = element;
+    }
+    ListViewItem.prototype = new Item();
+    ListViewItem.prototype.draw = function(child) {
       var self = this;
-      Control.call(self, 'view ' + className);
+      self.element.appendChild(child);
+    };
+
+    //function View(className, list, itemTemplate) {
+    //  var self = this;
+    //  Control.call(self, className);
+    //  if (list) {
+    //    list.addEventListener('ItemAdded', function (e) {
+    //      self.onItemAdded(e);
+    //    });
+    //    list.addEventListener('ItemRemoved', function (e) {
+    //      self.onItemRemoved(e);
+    //    });
+    //    list.addEventListener('ItemUpdated', function (e) {
+    //      self.onItemUpdated(e);
+    //    });
+    //    self.itemTemplate = itemTemplate;
+    //    self.list = list;
+    //  }
+    //}
+    //
+    //View.prototype = new Control();
+    //View.prototype.draw = function () {
+    //  var self = this, list = self.list, itemTemplate = self.itemTemplate;
+    //  self.empty();
+    //  for (var i = 0, l = list.length; i < l; i++) {
+    //    self.drawChild(itemTemplate(list[i]));
+    //  }
+    //};
+    //View.prototype.drawChild = function(child) {
+    //  var self = this;
+    //  child.className = self.className + '-item';
+    //  self.element.appendChild(child);
+    //};
+    //View.prototype.onItemAdded = null;
+    //View.prototype.onItemRemoved = null;
+    //View.prototype.onItemUpdated = null;
+
+    /**
+     * List
+     * @param element
+     * @param list
+     * @param itemTemplate
+     * @constructor
+     */
+    function ListView(list, itemTemplate) {
+      var self = this, element;
+      self.className = CLASS_NAME.LIST_VIEW;
+      element = document.createElement('ul');
+      element.className = CLASS_NAME.LIST_VIEW;
+      self.element = element;
       if (list) {
         list.addEventListener('ItemAdded', function (e) {
           self.onItemAdded(e);
@@ -237,48 +299,30 @@ any = (function () {
       }
     }
 
-    View.prototype = new Control();
-    View.prototype.draw = function () {
-      var self = this, list = self.list, element = self.element, child,
+    ListView.prototype = new Control();
+    ListView.prototype.draw = function () {
+      var self = this, list = self.list, item, element = self.element,
         itemTemplate = self.itemTemplate;
       self.empty();
       for (var i = 0, l = list.length; i < l; i++) {
-        child = itemTemplate(list[i]);
-        child.className = CLASS_NAME.LIST_VIEW_ITEM;
-        element.appendChild(child);
+        item = new ListViewItem(self.className + '-item');
+        item.draw(itemTemplate(list[i]));
+        element.appendChild(item.element);
       }
     };
-    View.prototype.onItemAdded = null;
-    View.prototype.onItemRemoved = null;
-    View.prototype.onItemUpdated = null;
-
-    /**
-     * List
-     * @param element
-     * @param list
-     * @param itemTemplate
-     * @constructor
-     */
-    function ListView(list, itemTemplate) {
-      var self = this;
-      View.call(self, CLASS_NAME.LIST_VIEW, list, itemTemplate);
-    }
-
-    ListView.prototype = new View();
     ListView.prototype.onItemAdded = function (e) {
       var self = this, args, item;
       args = e.args;
-      item = args.item;
-      item = self.itemTemplate(item);
-      item.className = CLASS_NAME.LIST_VIEW_ITEM;
-      self.element.appendChild(item);
+      item = new ListViewItem(self.className + '-item');
+      item.draw(self.itemTemplate(args.item));
+      self.element.appendChild(item.element);
     };
     ListView.prototype.onItemRemoved = function (e) {
       var self = this, args, index, child;
       args = e.args;
       index = args.index;
       if (!isNaN(index)) {
-        child = document.querySelector('.' + CLASS_NAME.LIST_VIEW_ITEM + ':nth-child(' + (index + 1) + ')');
+        child = document.querySelector('.' + self.className + '-item:nth-child(' + (index + 1) + ')');
         self.element.removeChild(child);
       }
     };
@@ -286,12 +330,11 @@ any = (function () {
       var self = this, args, index, item, child;
       args = e.args;
       index = args.index;
-      item = args.item;
       if (!isNaN(index)) {
-        child = document.querySelector('.' + CLASS_NAME.LIST_VIEW_ITEM + ':nth-child(' + (index + 1) + ')');
-        item = self.itemTemplate(item);
-        item.className = CLASS_NAME.LIST_VIEW_ITEM;
-        self.element.replaceChild(item, child);
+        child = document.querySelector('.' + self.className + '-item:nth-child(' + (index + 1) + ')');
+        item = new ListViewItem(self.className + '-item');
+        item.draw(self.itemTemplate(args.item));
+        self.element.appendChild(item.element);
       }
     };
 

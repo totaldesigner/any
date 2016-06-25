@@ -15,7 +15,7 @@ any.ui = (function () {
 
   }
 
-  Menu.prototype = new controls.List();
+  Menu.prototype = new controls.ListView();
 
   function ContextMenu() {
 
@@ -33,7 +33,7 @@ any.ui = (function () {
 
   }
 
-  Pagination.prototype = new controls.List();
+  Pagination.prototype = new controls.ListView();
 
   return {
     ContextMenu: ContextMenu,
