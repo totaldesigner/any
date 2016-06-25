@@ -8,14 +8,24 @@
 if (typeof any === 'undefined') {
   throw new Error('any.ui\'s JavaScript requires any');
 }
+
+var UI_CLASS_NAME = {
+  MENU: 'menu',
+  MENU_ITEM: 'menu-item'
+};
+
 any.ui = (function () {
-  var controls = any.controls;
+  var controls, ListView, Layer;
+  controls = any.controls;
+  ListView = controls.ListView;
+  Layer = controls.Layer;
 
   function Menu() {
-
+    var self = this;
+    ListView.call(self, UI_CLASS_NAME.MENU);
   }
 
-  Menu.prototype = new controls.ListView();
+  Menu.prototype = new ListView();
 
   function ContextMenu() {
 
@@ -27,13 +37,13 @@ any.ui = (function () {
 
   }
 
-  Dialog.prototype = new controls.Layer();
+  Dialog.prototype = new Layer();
 
   function Pagination() {
 
   }
 
-  Pagination.prototype = new controls.ListView();
+  Pagination.prototype = new ListView();
 
   return {
     ContextMenu: ContextMenu,

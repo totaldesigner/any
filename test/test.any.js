@@ -1,33 +1,26 @@
 var any = any || {};
+var List, ListView, Layout, Layer, Page;
+List = any.collections.List;
+ListView = any.controls.ListView;
+Layout = any.controls.Layout;
+Layer = any.controls.Layer;
+Page = any.controls.Page;
 
-describe('test any.js', function () {
-  it('should return the name of item', function () {
+describe('any.js', function () {
+  it('should return the item\'s name of List', function () {
     var List, list;
     List = any.collections.List;
     list = new List([{name: 'MS'}]);
     list.should.equal(list);
   });
-  it('should return the page', function () {
-    var List, ListView, Layout, Layer, Page;
-    var body, div, listView, layout, layer, page;
-
-    List = any.collections.List;
-    ListView = any.controls.ListView;
-    Layout = any.controls.Layout;
-    Layer = any.controls.Layer;
-    Page = any.controls.Page;
+  it('should display the ListView without error', function () {
+    var div, listView, layout, layer, page;
 
     // List
-    list = new List([{
-      name: 'mspark1'
-    }, {
-      name: 'mspark2'
-    }, {
-      name: 'mspark3'
-    }]);
+    list = new List([{name: 'mspark1'}, {name: 'mspark2'}, {name: 'mspark3'}]);
 
     // ListView
-    listView = new ListView(list, function(item) {
+    listView = new ListView(list, function (item) {
       d = document.createElement('div');
       d.appendChild(document.createTextNode(item.name));
       return d;
@@ -42,11 +35,7 @@ describe('test any.js', function () {
     layer.append(layout);
 
     // Page
-    body = document.getElementsByTagName('body')[0];
-    div = document.createElement('div');
-    div.className = 'any';
-    body.appendChild(div);
-    page = new Page(div);
+    page = new Page();
     page.append(layer);
     page.draw();
 

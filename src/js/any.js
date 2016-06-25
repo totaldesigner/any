@@ -246,17 +246,18 @@ any = (function () {
       self.element.appendChild(child);
     };
 
-      /**
-       * ListView
-       * @param list
-       * @param itemTemplate
-       * @constructor
+    /**
+     * ListView
+     * @param list
+     * @param itemTemplate
+     * @param className
+     * @constructor
        */
-    function ListView(list, itemTemplate) {
+    function ListView(list, itemTemplate, className) {
       var self = this, element;
-      self.className = CLASS_NAME.LIST_VIEW;
+      self.className = className || CLASS_NAME.LIST_VIEW;
       element = document.createElement('ul');
-      element.className = CLASS_NAME.LIST_VIEW;
+      element.className = self.className;
       self.element = element;
       if (list) {
         list.addEventListener('ItemAdded', function (e) {
@@ -334,10 +335,9 @@ any = (function () {
 
     Layer.prototype = new Control();
 
-    function Page(parent) {
+    function Page() {
       var self = this;
       Control.call(self, CLASS_NAME.PAGE);
-      self.parent = parent;
     }
 
     /**
@@ -346,9 +346,11 @@ any = (function () {
        */
     Page.prototype = new Control();
     Page.prototype.draw = function() {
-      var self = this;
+      var self = this, body;
+      body = document.getElementsByTagName('body')[0];
+      body.className = 'any';
       Control.prototype.draw.call(self);
-      self.parent.appendChild(self.element);
+      body.appendChild(self.element);
     };
 
     return {
