@@ -4,10 +4,12 @@
 
 var CLASS_NAME = {
   VIEW: 'view',
-  LIST: 'list',
-  LIST_ITEM: 'list-item',
+  ITEM: 'item',
+  LIST_VIEW: 'list-view',
+  LIST_VIEW_ITEM: 'list-view-item',
   LAYOUT: 'layout',
-  LAYER: 'layer'
+  LAYER: 'layer',
+  PAGE: 'page'
 };
 
 var any = any || {};
@@ -26,7 +28,7 @@ any = (function () {
     }
   }
 
-  /**
+    /**
    * Event
    * @param name
    * @param sender
@@ -178,7 +180,7 @@ any = (function () {
   /**
    * controls
    * @type {{List, Layout, Layer}}
-     */
+   */
   controls = (function () {
     /**
      * Control
@@ -189,29 +191,34 @@ any = (function () {
       element = document.createElement('div');
       element.className = className;
       self.element = element;
+      self.items = [];
     }
 
     mixin(Control.prototype, EventTarget.prototype);
-
-    function Item() {
+    Control.prototype.append = function (item) {
       var self = this;
-      Control.call(self, 'item');
-    }
-
-    Item.prototype = new Control();
-
-    function ListItem() {
-      var self = this, element;
-      element = document.createElement('li');
-      element.className = 'list-item';
-      self.element = element;
-    }
-
-    ListItem.prototype = new Item();
+      self.items.push(item);
+    };
+    Control.prototype.empty = function () {
+      var self = this, element = self.element;
+      while (element.hasChildNodes()) {
+        element.removeChild(element.firstChild);
+      }
+      self.items = [];
+    };
+    Control.prototype.draw = function () {
+      var self = this, item, items = self.items, element = self.element;
+      self.empty();
+      for (var i = 0, l = items.length; i < l; i++) {
+        item = items[i];
+        element.appendChild(item.element);
+        item.draw();
+      }
+    };
 
     function View(className, list, itemTemplate) {
       var self = this;
-      Control.call(self, 'view, ' + className);
+      Control.call(self, 'view ' + className);
       if (list) {
         list.addEventListener('ItemAdded', function (e) {
           self.onItemAdded(e);
@@ -223,17 +230,19 @@ any = (function () {
           self.onItemUpdated(e);
         });
         self.itemTemplate = itemTemplate;
+        self.list = list;
       }
     }
 
     View.prototype = new Control();
     View.prototype.draw = function () {
-      var self = this, list = self.list, element = self.element;
-      while (element.hasChildNodes()) {
-        element.removeChild(element.firstChild);
-      }
+      var self = this, list = self.list, element = self.element, child,
+        itemTemplate = self.itemTemplate;
+      self.empty();
       for (var i = 0, l = list.length; i < l; i++) {
-        self.element.appendChild(self.itemTemplate(list[i]));
+        child = itemTemplate(list[i]);
+        child.className = CLASS_NAME.LIST_VIEW_ITEM;
+        element.appendChild(child);
       }
     };
     View.prototype.onItemAdded = null;
@@ -247,49 +256,74 @@ any = (function () {
      * @param itemTemplate
      * @constructor
      */
-    function List(list, itemTemplate) {
+    function ListView(list, itemTemplate) {
       var self = this;
-      View.call(self, CLASS_NAME.LIST, list, itemTemplate);
+      View.call(self, CLASS_NAME.LIST_VIEW, list, itemTemplate);
     }
 
-    List.prototype = new View();
-    List.prototype.onItemAdded = function (e) {
-      var self = this;
-      self.element.appendChild(self.itemTemplate(e.args));
+    ListView.prototype = new View();
+    ListView.prototype.onItemAdded = function (e) {
+      var self = this, args, item;
+      args = e.args;
+      item = args.item;
+      item = self.itemTemplate(item);
+      item.className = CLASS_NAME.LIST_VIEW_ITEM;
+      self.element.appendChild(item);
     };
-    List.prototype.onItemRemoved = function (e) {
-      var self = this, args, index;
+    ListView.prototype.onItemRemoved = function (e) {
+      var self = this, args, index, child;
       args = e.args;
       index = args.index;
-      if (isNumber(index)) {
-        self.element.removeAt(index);
+      if (!isNaN(index)) {
+        child = document.querySelector('.' + CLASS_NAME.LIST_VIEW_ITEM + ':nth-child(' + (index + 1) + ')');
+        self.element.removeChild(child);
       }
     };
-    List.prototype.onItemUpdated = function (e) {
-      var self = this, args, index;
+    ListView.prototype.onItemUpdated = function (e) {
+      var self = this, args, index, item, child;
       args = e.args;
       index = args.index;
-      if (isNumber(index)) {
-        self.element.child()
+      item = args.item;
+      if (!isNaN(index)) {
+        child = document.querySelector('.' + CLASS_NAME.LIST_VIEW_ITEM + ':nth-child(' + (index + 1) + ')');
+        item = self.itemTemplate(item);
+        item.className = CLASS_NAME.LIST_VIEW_ITEM;
+        self.element.replaceChild(item, child);
       }
     };
 
     function Layout() {
-
+      var self = this;
+      Control.call(self, CLASS_NAME.LAYOUT);
     }
 
     Layout.prototype = new Control();
 
     function Layer() {
-
+      var self = this;
+      Control.call(self, CLASS_NAME.LAYER);
     }
 
     Layer.prototype = new Control();
 
+    function Page(parent) {
+      var self = this;
+      Control.call(self, CLASS_NAME.PAGE);
+      self.parent = parent;
+    }
+
+    Page.prototype = new Control();
+    Page.prototype.draw = function() {
+      var self = this;
+      Control.prototype.draw.call(self);
+      self.parent.appendChild(self.element);
+    };
+
     return {
-      List: List,
+      ListView: ListView,
       Layout: Layout,
-      Layer: Layer
+      Layer: Layer,
+      Page: Page
     }
   })();
 
@@ -298,19 +332,3 @@ any = (function () {
     controls: controls
   };
 })(any);
-
-// module.exports = {
-//   collections: any.collections,
-//   views: any.views
-// };
-// var List = any.collections.List;
-// var ListView = any.views.ListView;
-// list = new List([{text: '1'}, {text: '2'}, {text: '3'}]);
-// listView = new ListView(document.getElementsByTagName('body')[0], list, function (item) {
-//   var div = document.createElement('div');
-//   var text = document.createTextNode(item.text);
-//   div.appendChild(text);
-//   return div;
-// });
-// listView.draw();
-
