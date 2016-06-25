@@ -1,0 +1,45 @@
+@import (inline) "normalize.css/normalize.css";
+
+body {
+  background-color: azure;
+}
+
+.any {
+  .item {
+    float: left;
+  }
+  .layer {
+    position: absolute;
+    left: 0;
+    top: 0;
+  }
+  .layout {
+    .item {
+
+    }
+  }
+  .view {
+    &.list {
+      .list-item {
+
+      }
+    }
+  }
+}
+
+.any {
+  .layer {
+    &.dialog {
+      display: none;
+      overflow: hidden;
+      position: fixed;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+      -webkit-overflow-scrolling: touch;
+      outline: 0;
+    }
+  }
+}
+
