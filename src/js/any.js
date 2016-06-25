@@ -1,6 +1,8 @@
 /**
  * Created by mspark on 6/22/16.
  */
+/*jshint browser:true */
+'use strict';
 
 var CLASS_NAME = {
   VIEW: 'view',
@@ -96,13 +98,14 @@ any = (function () {
     self.listeners[name].push(callback);
   };
   EventTarget.prototype.removeEventListener = function (name, callback) {
-    var self = this;
+    var self = this, stack;
     if (!self.listeners) {
       self.listeners = {};
     }
     if (!(name in self.listeners)) {
       return false;
     }
+    stack = self.listeners[name];
     if (callback) {
       for (var i = 0, l = stack.length; i < l; i++) {
         if (stack[i] === callback) {
@@ -115,11 +118,11 @@ any = (function () {
     }
   };
   EventTarget.prototype.dispatchEvent = function (event) {
-    var self = this;
+    var self = this, stack;
     if (!(event.name in self.listeners)) {
       return;
     }
-    var stack = self.listeners[event.name];
+    stack = self.listeners[event.name];
     event.target = self;
     for (var i = 0, l = stack.length; i < l; i++) {
       stack[i].call(self, event);
@@ -170,11 +173,11 @@ any = (function () {
     List.prototype.update = function (index, item) {
       var self = this;
       self[index] = item;
-      self.dispatchEvent(new ItemUpdated(self, {index: index, item: item}))
+      self.dispatchEvent(new ItemUpdated(self, {index: index, item: item}));
     };
     return {
       List: List
-    }
+    };
   })();
 
   /**
@@ -324,7 +327,7 @@ any = (function () {
       Layout: Layout,
       Layer: Layer,
       Page: Page
-    }
+    };
   })();
 
   return {

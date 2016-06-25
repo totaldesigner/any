@@ -2,11 +2,12 @@
 
 var gulp = require('gulp');
 var browserSync = require('browser-sync');
-var mocha = require('gulp-mocha');
+//var mocha = require('gulp-mocha');
+var concat = require('gulp-concat');
 var cssmin = require('gulp-cssmin');
 var mochaPhantomJS = require('gulp-mocha-phantomjs');
 var uglify = require('gulp-uglify');
-var util = require('gulp-util');
+//var util = require('gulp-util');
 
 // Load plugins
 var $ = require('gulp-load-plugins')();
@@ -34,8 +35,6 @@ gulp.task('styles', function () {
     .pipe(gulp.dest('dist/css'))
     .pipe(browserSync.reload({stream: true}));
 });
-
-var concat = require('gulp-concat');
 
 gulp.task('scripts', function () {
   return gulp.src('src/js/*.js')
@@ -78,7 +77,7 @@ gulp.task('browser-sync', function () {
 gulp.task('test', function () {
   return gulp
     .src('test/test.any.html')
-    .pipe(mochaPhantomJS({reporter: 'spec', dump: 'test/test.log'}))
+    .pipe(mochaPhantomJS({reporter: 'spec', dump: 'test/test.log'}));
 });
 
 gulp.task('watch', ['build'], function () {
@@ -98,6 +97,12 @@ gulp.task('selfcheck', function () {
     .pipe($.jshint.reporter('fail'));
 });
 
+gulp.task('check', function () {
+  return gulp.src('src/**/*.js')
+    .pipe($.jshint())
+    .pipe($.jshint.reporter('default'))
+    .pipe($.jshint.reporter('fail'));
+});
 
 gulp.task('clean', function (cb) {
   var del = require('del');
@@ -105,7 +110,7 @@ gulp.task('clean', function (cb) {
 });
 
 
-gulp.task('build', ['scripts', 'styles', 'views', 'images']);
+gulp.task('build', ['check', 'scripts', 'styles', 'views', 'images']);
 
 
 gulp.task('default', ['clean'], function () {

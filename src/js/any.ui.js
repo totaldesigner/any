@@ -1,6 +1,10 @@
 /**
  * Created by mspark on 16. 6. 25.
  */
+/*jshint browser:true */
+/*globals any:false */
+'use strict';
+
 if (typeof any === 'undefined') {
   throw new Error('any.ui\'s JavaScript requires any');
 }
