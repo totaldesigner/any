@@ -1,0 +1,35 @@
+.any .layer.dialog {
+  display: none;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  -webkit-overflow-scrolling: touch;
+  outline: 0;
+}
+.any ul.menu {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.any ul.menu:after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.any ul.menu li.menu-item {
+  float: left;
+  width: auto;
+}
+.any ul.menu li.menu-item a {
+  display: block;
+  padding: 5px;
+  color: #000000;
+  font-size: 14px;
+  text-decoration: none;
+}
+.any ul.menu li.menu-item a:hover {
+  background-color: #eeeeee;
+}

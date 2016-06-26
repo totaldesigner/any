@@ -219,6 +219,9 @@ any = (function () {
         item.draw();
       }
     };
+    Control.prototype.addClass = function (className) {
+      this.element.className += ' ' + className;
+    };
 
     /**
      * Item
