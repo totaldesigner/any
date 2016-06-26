@@ -20,9 +20,9 @@ any.ui = (function () {
   ListView = controls.ListView;
   Layer = controls.Layer;
 
-  function Menu() {
+  function Menu(list, itemTemplate) {
     var self = this;
-    ListView.call(self, UI_CLASS_NAME.MENU);
+    ListView.call(self, list, itemTemplate, UI_CLASS_NAME.MENU);
   }
 
   Menu.prototype = new ListView();
