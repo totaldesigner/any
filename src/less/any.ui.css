@@ -33,3 +33,10 @@
 .any ul.menu li.menu-item a:hover {
   background-color: #eeeeee;
 }
+/* ########### 599px 이하 ########### */
+@media (max-width: 599px) {
+  .any li.menu a {
+    padding: 10px 3px;
+    font-size: 11px;
+  }
+}

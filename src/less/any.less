@@ -1,26 +1,49 @@
 @import (inline) "normalize.css/normalize.css";
 
 body {
-  background-color: azure;
+  font-family: '맑은 고딕', 'Apple SD Gothic Neo', sans-serif;
 }
 
 .any {
   .item {
     float: left;
   }
-  .layer {
-    position: absolute;
-    left: 0;
-    top: 0;
-  }
-  .layout {
-    .item {
+  .box {
 
-    }
+  }
+  .layer {
+    padding: 20px 15px 10px 15px;
   }
   .list-view {
     .list-view-item {
 
+    }
+  }
+}
+
+/* ########## 1190px 이상 ########## */
+@media (min-width: 1190px) {
+  .layer {
+    width: 1140px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* ########## 768px 이상 ########## */
+@media (min-width: 768px) {
+  .any {
+    .box {
+      &.horizontal {
+        &:after {
+          content: "";
+          display: block;
+          clear: both;
+        }
+        > .box {
+          float: left;
+        }
+      }
     }
   }
 }

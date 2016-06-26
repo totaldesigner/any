@@ -31,7 +31,7 @@ gulp.task('styles', function () {
       })
     ]))
     .pipe(concat('any.css'))
-    .pipe(cssmin())
+    //.pipe(cssmin())
     .pipe(gulp.dest('dist/css'))
     .pipe(browserSync.reload({stream: true}));
 });

@@ -5,6 +5,7 @@
 'use strict';
 
 var CLASS_NAME = {
+  BOX: 'box',
   VIEW: 'view',
   ITEM: 'item',
   LIST_VIEW: 'list-view',
@@ -30,7 +31,7 @@ any = (function () {
     }
   }
 
-    /**
+  /**
    * Event
    * @param name
    * @param sender
@@ -183,13 +184,13 @@ any = (function () {
   /**
    * controls
    * @type {{ListView, Layout, Layer, Page}}
-     */
+   */
   controls = (function () {
     /**
      * Control
      * @param className
      * @constructor
-       */
+     */
     function Control(className) {
       var self = this, element;
       element = document.createElement('div');
@@ -215,6 +216,9 @@ any = (function () {
       self.empty();
       for (var i = 0, l = items.length; i < l; i++) {
         item = items[i];
+        if (element.className.indexOf('horizontal') > -1) {
+          item.element.style.width = (100 / l) + '%';
+        }
         element.appendChild(item.element);
         item.draw();
       }
@@ -226,25 +230,29 @@ any = (function () {
     /**
      * Item
      * @constructor
-       */
-    function Item() {
-
+     */
+    function Item(element) {
+      var self = this;
+      self.element = element;
+      self.items = [];
     }
+
     Item.prototype = new Control();
 
     /**
      * ListViewItem
      * @param className
      * @constructor
-       */
+     */
     function ListViewItem(className) {
       var self = this, element;
       element = document.createElement('li');
       element.className = className;
       self.element = element;
     }
+
     ListViewItem.prototype = new Item();
-    ListViewItem.prototype.draw = function(child) {
+    ListViewItem.prototype.draw = function (child) {
       var self = this;
       self.element.appendChild(child);
     };
@@ -255,7 +263,7 @@ any = (function () {
      * @param itemTemplate
      * @param className
      * @constructor
-       */
+     */
     function ListView(list, itemTemplate, className) {
       var self = this, element;
       self.className = className || CLASS_NAME.LIST_VIEW;
@@ -317,20 +325,24 @@ any = (function () {
     };
 
     /**
-     * Layout
+     * Box
+     * @param child
      * @constructor
-       */
-    function Layout() {
+     */
+    function Box(child) {
       var self = this;
-      Control.call(self, CLASS_NAME.LAYOUT);
+      Control.call(self, CLASS_NAME.BOX);
+      if (child) {
+        self.items.push(child);
+      }
     }
 
-    Layout.prototype = new Control();
+    Box.prototype = new Control();
 
     /**
      * Layer
      * @constructor
-       */
+     */
     function Layer() {
       var self = this;
       Control.call(self, CLASS_NAME.LAYER);
@@ -346,9 +358,9 @@ any = (function () {
     /**
      * Page
      * @type {Control}
-       */
+     */
     Page.prototype = new Control();
-    Page.prototype.draw = function() {
+    Page.prototype.draw = function () {
       var self = this, body;
       body = document.getElementsByTagName('body')[0];
       body.className = 'any';
@@ -357,8 +369,9 @@ any = (function () {
     };
 
     return {
+      Item: Item,
+      Box: Box,
       ListView: ListView,
-      Layout: Layout,
       Layer: Layer,
       Page: Page
     };

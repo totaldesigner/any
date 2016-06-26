@@ -15,7 +15,7 @@ describe('any.js', function () {
     list.should.equal(list);
   });
   it('should display the ListView without error', function () {
-    var div, listView, layout, layer, page;
+    var div, listView, layer, page;
 
     // List
     list = new List([{name: 'mspark1'}, {name: 'mspark2'}, {name: 'mspark3'}]);
@@ -27,13 +27,9 @@ describe('any.js', function () {
       return d;
     });
 
-    // Layout
-    layout = new Layout();
-    layout.append(listView);
-
     // Layer
     layer = new Layer();
-    layer.append(layout);
+    layer.append(listView);
 
     // Page
     page = new Page();
@@ -51,7 +47,7 @@ describe('any.js', function () {
     });
   });
   it('should display the Menu without error', function () {
-    var a, list, menu, layout, layer, page;
+    var a, list, menu, layer, page;
 
     // List
     list = new List([{name: '메인'}, {name: '잡화'}, {name: '도구'}, {name: '외출'}, {name: '음식'}, {name: '문의'}]);
@@ -63,13 +59,9 @@ describe('any.js', function () {
       return a;
     });
 
-    // Layout
-    layout = new Layout();
-    layout.append(menu);
-
     // Layer
     layer = new Layer();
-    layer.append(layout);
+    layer.append(menu);
 
     // Page
     page = new Page();
