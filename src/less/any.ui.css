@@ -9,28 +9,31 @@
   -webkit-overflow-scrolling: touch;
   outline: 0;
 }
+.any ul {
+  list-style: none;
+}
 .any ul.menu {
   margin: 0;
   padding: 0;
-  list-style: none;
 }
-.any ul.menu:after {
+.any ul:after {
   content: "";
   display: block;
   clear: both;
 }
-.any ul.menu li.menu-item {
+.any ul li.menu-item {
   float: left;
   width: auto;
 }
-.any ul.menu li.menu-item a {
+.any ul li a {
   display: block;
   padding: 5px;
   color: #000000;
   font-size: 14px;
   text-decoration: none;
+  cursor: pointer;
 }
-.any ul.menu li.menu-item a:hover {
+.any ul li a:hover {
   background-color: #eeeeee;
 }
 /* ########### 599px 이하 ########### */

@@ -1,12 +1,11 @@
 .any {
   .box {
-    &.header, &.footer, &.photo {
+    &.header, &.footer {
       padding: 20px 15px 10px 15px;
     }
     &.header {
       border-bottom: solid 1px #dddddd;
       .menu {
-        float: right;
         a {
           padding: 10px 15px;
         }
@@ -23,7 +22,43 @@
 
     }
     &.info {
-
+      //padding-bottom: 20px;
+      padding: 20px;
+      .info-main {
+        width: 70% !important;
+        padding: 20px;
+        border: solid 5px #dddddd;
+        h1 {
+          margin-top: 0;
+          margin-bottom: 5px;
+          font-size: 18px;
+          color: #666666;
+        }
+        li {
+          a {
+            border-bottom: dotted 2px #dddddd;
+            &:after	{
+              content: "";
+              display: block;
+              clear: both
+            }
+            time {
+              color: #888888;
+              font-weight: bold;
+              float: left;
+              width: 60px
+            }
+            div {
+              float: none;
+              width: auto;
+              margin-left: 60px
+            }
+          }
+        }
+      }
+      .info-sub {
+        width: 30% !important;
+      }
     }
     &.footer {
       padding-top: 15px;
@@ -34,6 +69,19 @@
           margin: 0;
           color: #666666;
           font-size: 14px;
+        }
+      }
+    }
+  }
+}
+
+/* ########## 768px 이상 ########## */
+@media (min-width: 768px) {
+  .any {
+    .box {
+      &.header {
+        .menu {
+          float: right;
         }
       }
     }

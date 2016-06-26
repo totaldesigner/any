@@ -10,10 +10,10 @@ if (typeof any === 'undefined') {
 }
 
 (function () {
-  var Page, Layer, Menu, List, Box, Item,
+  var Page, Layer, Menu, List, Box, Item, ListView,
     page, layer, menu, list, header, photo, pickup, info, footer,
     headerInner, footerInner, headerLogo, headerMenu, logo, img, copyright,
-    pickup1, pickup2, pickup3;
+    pickup1, pickup2, pickup3, infoMain, infoSub, listView;
 
   Page = any.controls.Page;
   Layer = any.controls.Layer;
@@ -21,6 +21,7 @@ if (typeof any === 'undefined') {
   List = any.collections.List;
   Box = any.controls.Box;
   Item = any.controls.Item;
+  ListView = any.controls.ListView;
 
   list = new List([{
     name: '메인'
@@ -68,12 +69,36 @@ if (typeof any === 'undefined') {
   pickup2 = new Box();
   pickup3 = new Box();
   pickup = new Box();
-  pickup.addClass('pickup');
+  pickup.addClass('pickup horizontal');
+  pickup.append(pickup1);
+  pickup.append(pickup2);
+  pickup.append(pickup3);
   layer.append(pickup);
 
   // info
+  list = new List([{
+    time: '10/15', content: '데이터센터 유지 보수를 수행합니다.'
+  }, {
+    time: '10/05', content: '안드로이드 애플리케이션 버전 1.2를 출시했습니다.'
+  }, {
+    time: '09/22', content: '세미나/캠페인과 관련된 공지사항'
+  }, {
+    time: '09/15', content: '그래프 표시의 변경 방식을 쉽게 바꿨습니다.'
+  }]);
+  listView = new ListView(list, function(item) {
+    var a;
+    a = document.createElement('a');
+    a.innerHTML = '<time>' + item.time + '</time><div>' + item.content + '</div>';
+    return a;
+  });
+  infoMain = new Box(listView);
+  infoMain.addClass('info-main');
+  infoSub = new Box();
+  infoSub.addClass('info-sub');
   info = new Box();
-  info.addClass('info');
+  info.addClass('info horizontal');
+  info.append(infoMain);
+  info.append(infoSub);
   layer.append(info);
 
   // footer
