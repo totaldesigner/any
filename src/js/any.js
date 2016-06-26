@@ -213,7 +213,7 @@ any = (function () {
     };
     Control.prototype.draw = function () {
       var self = this, item, items = self.items, element = self.element;
-      self.empty();
+      //self.empty();
       for (var i = 0, l = items.length; i < l; i++) {
         item = items[i];
         if (element.className.indexOf('horizontal') > -1) {

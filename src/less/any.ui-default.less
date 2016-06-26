@@ -1,8 +1,15 @@
 .any {
   .box {
+    &.header, &.footer, &.photo {
+      padding: 20px 15px 10px 15px;
+    }
     &.header {
+      border-bottom: solid 1px #dddddd;
       .menu {
         float: right;
+        a {
+          padding: 10px 15px;
+        }
       }
     }
     &.photo {
@@ -19,11 +26,25 @@
 
     }
     &.footer {
+      padding-top: 15px;
+      padding-bottom: 15px;
+      background-color: #dddddd;
       .copyright {
-        margin: 0;
-        color: #666666;
-        font-size: 14px;
+        > p {
+          margin: 0;
+          color: #666666;
+          font-size: 14px;
+        }
       }
     }
+  }
+}
+
+/* ########## 1190px 이상 ########## */
+@media (min-width: 1190px) {
+  .header-inner, .footer-inner, .photo, .pickup, .info {
+    width: 1140px;
+    margin-left: auto;
+    margin-right: auto;
   }
 }

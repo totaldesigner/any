@@ -11,7 +11,9 @@ if (typeof any === 'undefined') {
 
 (function () {
   var Page, Layer, Menu, List, Box, Item,
-    page, layer, menu, list, header, photo, pickup, info, footer, headerLogo, headerMenu, logo, img, copyright;
+    page, layer, menu, list, header, photo, pickup, info, footer,
+    headerInner, footerInner, headerLogo, headerMenu, logo, img, copyright,
+    pickup1, pickup2, pickup3;
 
   Page = any.controls.Page;
   Layer = any.controls.Layer;
@@ -40,22 +42,18 @@ if (typeof any === 'undefined') {
     return a;
   });
 
-  pickup = new Box();
-  pickup.addClass('pickup');
-  info = new Box();
-  info.addClass('info');
-  //layer.append(pickup);
-  //layer.append(info);
-
   // header
   logo = document.createElement('div').appendChild(document.createElement('h1')
-      .appendChild(document.createTextNode('Anyplace, Anywhere, Anytime')));
+      .appendChild(document.createTextNode('_')));
   headerLogo = new Box(new Item(logo));
   headerMenu = new Box(menu);
+  headerInner = new Box();
+  headerInner.addClass('header-inner horizontal');
+  headerInner.append(headerLogo);
+  headerInner.append(headerMenu);
   header = new Box();
-  header.addClass('header horizontal');
-  header.append(headerLogo);
-  header.append(headerMenu);
+  header.addClass('header');
+  header.append(headerInner);
   layer.append(header);
 
   // photo
@@ -65,10 +63,26 @@ if (typeof any === 'undefined') {
   photo.addClass('photo');
   layer.append(photo);
 
+  // pickup
+  pickup1 = new Box();
+  pickup2 = new Box();
+  pickup3 = new Box();
+  pickup = new Box();
+  pickup.addClass('pickup');
+  layer.append(pickup);
+
+  // info
+  info = new Box();
+  info.addClass('info');
+  layer.append(info);
+
   // footer
-  copyright = document.createElement('div').appendChild(document.createElement('p')
-      .appendChild(document.createTextNode('Copyright© totaldesigner')));
-  footer = new Box(new Item(copyright));
+  copyright = document.createElement('div');
+  copyright.className = 'copyright';
+  copyright.innerHTML = '<p>Copyright© totaldesigner</p>';
+  footerInner = new Box(new Item(copyright));
+  footerInner.addClass('footer-inner');
+  footer = new Box(footerInner);
   footer.addClass('footer');
   layer.append(footer);
 
