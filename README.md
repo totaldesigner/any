@@ -4,7 +4,7 @@
 
 ## Inatall 
 ``` shell
-git clone https://github.com/jejuboy/any
+git clone https://github.com/totaldesigner/any
 npm install
 bower install
 ```
