@@ -11,7 +11,7 @@ if (typeof any === 'undefined') {
 
 (function () {
   var Page, Layer, Menu, List, Box, Item,
-    page, layer, menu, list, header, photo, pickup, info, footer, headerLogo, headerMenu, logo, copyright;
+    page, layer, menu, list, header, photo, pickup, info, footer, headerLogo, headerMenu, logo, img, copyright;
 
   Page = any.controls.Page;
   Layer = any.controls.Layer;
@@ -40,35 +40,36 @@ if (typeof any === 'undefined') {
     return a;
   });
 
-  header = new Box();
-  header.addClass('header horizontal');
-  photo = new Box();
-  photo.addClass('photo');
   pickup = new Box();
   pickup.addClass('pickup');
   info = new Box();
   info.addClass('info');
-  footer = new Box();
-  footer.addClass('footer');
-  //layer.append(photo);
   //layer.append(pickup);
   //layer.append(info);
 
   // header
-  logo = document.createElement('div')
-    .appendChild(document.createElement('h1')
+  logo = document.createElement('div').appendChild(document.createElement('h1')
       .appendChild(document.createTextNode('Anyplace, Anywhere, Anytime')));
   headerLogo = new Box(new Item(logo));
   headerMenu = new Box(menu);
+  header = new Box();
+  header.addClass('header horizontal');
   header.append(headerLogo);
   header.append(headerMenu);
   layer.append(header);
 
+  // photo
+  img = document.createElement('img');
+  img.setAttribute('src', '../img/header.jpg');
+  photo = new Box(new Item(document.createElement('div').appendChild(img)));
+  photo.addClass('photo');
+  layer.append(photo);
+
   // footer
-  copyright = document.createElement('div')
-    .appendChild(document.createElement('p')
+  copyright = document.createElement('div').appendChild(document.createElement('p')
       .appendChild(document.createTextNode('Copyright© totaldesigner')));
-  footer.append(new Item(copyright));
+  footer = new Box(new Item(copyright));
+  footer.addClass('footer');
   layer.append(footer);
 
   page.append(layer);
