@@ -4,7 +4,6 @@
       padding: 20px 15px 10px 15px;
     }
     &.header {
-      border-bottom: solid 1px #dddddd;
       .menu {
         a {
           padding: 10px 15px;
@@ -75,6 +74,24 @@
   }
 }
 
+/* ########## 599px 이하 ########## */
+@media (max-width: 599px) {
+  .any {
+    .box {
+      &.header {
+        .menu {
+          li {
+            a {
+              padding: 10px 7px;
+              font-size: 11px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
 /* ########## 768px 이상 ########## */
 @media (min-width: 768px) {
   .any {
@@ -90,9 +107,17 @@
 
 /* ########## 1190px 이상 ########## */
 @media (min-width: 1190px) {
-  .header-inner, .footer-inner, .photo, .pickup, .info {
-    width: 1140px;
-    margin-left: auto;
-    margin-right: auto;
+  .any {
+    .box {
+      &.header {
+        margin-bottom: 20px;
+        border-bottom: solid 1px #dddddd;
+      }
+    }
+    .header-inner, .footer-inner, .photo, .pickup, .info {
+      width: 1140px;
+      margin-left: auto;
+      margin-right: auto;
+    }
   }
 }

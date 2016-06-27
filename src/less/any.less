@@ -6,6 +6,11 @@ body {
 }
 
 .any {
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
   .item {
     float: left;
   }
@@ -20,11 +25,12 @@ body {
   }
 }
 
-/* ########## 1190px 이상 ########## */
-@media (min-width: 1190px) {
+/* ########## 599px 이하 ########## */
+@media (max-width: 599px) {
   .layer {
   }
 }
+
 
 /* ########## 768px 이상 ########## */
 @media (min-width: 768px) {
@@ -41,5 +47,11 @@ body {
         }
       }
     }
+  }
+}
+
+/* ########## 1190px 이상 ########## */
+@media (min-width: 1190px) {
+  .layer {
   }
 }
