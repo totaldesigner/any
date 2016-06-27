@@ -1,6 +1,6 @@
-node_modules
-bower_components
-
-.DS_Store
 .idea/
+bower_components
 dist
+node_modules
+src/jade/*.html
+src/less/*.css

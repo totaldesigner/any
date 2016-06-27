@@ -13,7 +13,7 @@ if (typeof any === 'undefined') {
   var Page, Layer, Menu, List, Box, Item, ListView,
     page, layer, menu, list, header, photo, pickup, info, footer,
     headerInner, footerInner, headerLogo, headerMenu, logo, img, copyright,
-    pickup1, pickup2, pickup3, infoMain, infoSub, listView;
+    pickup1, pickup2, pickup3, news, infoMain, infoSub, listMain, listSub, listViewMain, listViewSub;
 
   Page = any.controls.Page;
   Layer = any.controls.Layer;
@@ -45,7 +45,7 @@ if (typeof any === 'undefined') {
 
   // header
   logo = document.createElement('div').appendChild(document.createElement('h1')
-      .appendChild(document.createTextNode('_')));
+    .appendChild(document.createTextNode('_')));
   headerLogo = new Box(new Item(logo));
   headerMenu = new Box(menu);
   headerInner = new Box();
@@ -76,7 +76,7 @@ if (typeof any === 'undefined') {
   layer.append(pickup);
 
   // info
-  list = new List([{
+  listMain = new List([{
     time: '10/15', content: '데이터센터 유지 보수를 수행합니다.'
   }, {
     time: '10/05', content: '안드로이드 애플리케이션 버전 1.2를 출시했습니다.'
@@ -85,15 +85,31 @@ if (typeof any === 'undefined') {
   }, {
     time: '09/15', content: '그래프 표시의 변경 방식을 쉽게 바꿨습니다.'
   }]);
-  listView = new ListView(list, function(item) {
+  listViewMain = new ListView(listMain, function (item) {
     var a;
     a = document.createElement('a');
     a.innerHTML = '<time>' + item.time + '</time><div>' + item.content + '</div>';
     return a;
   });
-  infoMain = new Box(listView);
+  listSub = new List([{
+    shortClass: 'tw', class: 'twitter', name: 'Twitter'
+  }, {
+    shortClass: 'fb', class: 'facebook', name: 'Facebook'
+  }, {
+    shortClass: 'gp', class: 'google-plus', name: 'Google+'
+  }]);
+  listViewSub = new ListView(listSub, function (item) {
+    var a;
+    a = document.createElement('a');
+    a.className = 'follow-' + item.shortClass;
+    a.innerHTML = '<i class="fa fa-fw fa-' + item.class + '"></i>' + item.name;
+    return a;
+  });
+  news = new Box(listViewMain);
+  news.addClass('news');
+  infoMain = new Box(news);
   infoMain.addClass('info-main');
-  infoSub = new Box();
+  infoSub = new Box(listViewSub);
   infoSub.addClass('info-sub');
   info = new Box();
   info.addClass('info horizontal');
