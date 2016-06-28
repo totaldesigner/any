@@ -15,9 +15,9 @@ gulp build
 ```
 
 ## Bower
-1. Registering your package with Bower
+1. Registering a package
 ``` shell
-bower register anyjs https://github.com/totaldesigner/totaldesigner.git  
+bower register anyjs https://github.com/totaldesigner/any.git  
 ```
 2. Updating and maintenance
 ``` shell
