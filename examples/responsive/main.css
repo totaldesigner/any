@@ -1,0 +1,134 @@
+.any .box.header,
+.any .box.footer {
+  padding: 20px 15px 10px 15px;
+}
+.any .box.header .menu a {
+  padding: 10px 15px;
+}
+.any .box.photo img {
+  max-width: 100%;
+  height: auto;
+  vertical-align: bottom;
+}
+.any .box.info {
+  padding: 20px;
+}
+.any .box.info .info-main {
+  width: 100% !important;
+  padding-bottom: 20px;
+}
+.any .box.info .info-main .news {
+  padding: 20px;
+  border: solid 5px #dddddd;
+}
+.any .box.info .info-main h1 {
+  margin-top: 0;
+  margin-bottom: 5px;
+  font-size: 18px;
+  color: #666666;
+}
+.any .box.info .info-main li a {
+  border-bottom: dotted 2px #dddddd;
+}
+.any .box.info .info-main li a:after {
+  content: "";
+  display: block;
+  clear: both;
+}
+.any .box.info .info-main li a time {
+  color: #888888;
+  font-weight: bold;
+  float: left;
+  width: 60px;
+}
+.any .box.info .info-main li a div {
+  float: none;
+  width: auto;
+  margin-left: 60px;
+}
+.any .box.info .info-sub {
+  width: 100% !important;
+}
+.any .box.info .info-sub ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.any .box.info .info-sub ul li a {
+  display: block;
+  margin-bottom: 10px;
+  padding: 10px;
+  border-radius: 4px;
+  color: #ffffff;
+  font-size: 14px;
+  text-decoration: none;
+}
+.any .box.info .info-sub ul li a:hover {
+  opacity: 0.8;
+  background-color: #eeeeee;
+}
+.any .box.info .info-sub ul li a.follow-tw {
+  background-color: #63bafb;
+}
+.any .box.info .info-sub ul li a.follow-fb {
+  background-color: #5288f7;
+}
+.any .box.info .info-sub ul li a.follow-gp {
+  background-color: #f65d4a;
+}
+.any .box.info .info-sub ul li a.fa-twitter:before {
+  content: "\f099";
+}
+.any .box.info .info-sub i {
+  margin-right: 10px;
+  font-size: 24px;
+  vertical-align: middle;
+}
+.any .box.footer {
+  padding-top: 15px;
+  padding-bottom: 15px;
+  background-color: #dddddd;
+}
+.any .box.footer .copyright > p {
+  margin: 0;
+  color: #666666;
+  font-size: 14px;
+}
+/* ########## 599px 이하 ########## */
+@media (max-width: 599px) {
+  .any .box.header .menu li a {
+    padding: 10px 7px;
+    font-size: 11px;
+  }
+}
+/* ########## 768px 이상 ########## */
+@media (min-width: 768px) {
+  .any .box.header .menu {
+    float: right;
+  }
+  .any .box.info .info-main {
+    width: 70% !important;
+    padding-right: 35px;
+    box-sizing: border-box;
+  }
+  .any .box.info .info-sub {
+    float: left;
+    width: 30% !important;
+  }
+}
+/* ########## 1190px 이상 ########## */
+@media (min-width: 1190px) {
+  .any .box.header {
+    margin-bottom: 20px;
+    border-bottom: solid 1px #dddddd;
+  }
+  .any .header-inner,
+  .any .footer-inner,
+  .any .photo,
+  .any .pickup,
+  .any .info {
+    width: 1140px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
