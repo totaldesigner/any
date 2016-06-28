@@ -1,7 +1,10 @@
 {
   "name": "anyjs",
   "version": "0.0.0",
-  "main": "dist/any.js",
+  "main": [
+    "dist/js/any.js",
+    "dist/css/any.css"
+  ],
   "ignore": [
     "src",
     "test",
