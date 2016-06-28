@@ -93,6 +93,11 @@ gulp.task('check', function () {
     .pipe($.jshint.reporter('fail'));
 });
 
+gulp.task('release', function () {
+  return gulp.src(['dist/js/any.js', 'dist/css/any.css'])
+    .pipe(gulp.dest(''));
+});
+
 gulp.task('clean', function (cb) {
   var del = require('del');
   del(['dist'], cb);

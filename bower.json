@@ -2,8 +2,8 @@
   "name": "anyjs",
   "version": "0.0.0",
   "main": [
-    "dist/js/any.js",
-    "dist/css/any.css"
+    "any.js",
+    "any.css"
   ],
   "ignore": [
     "src",
