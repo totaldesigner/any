@@ -43,28 +43,28 @@ gulp.task('scripts', function () {
     .pipe(gulp.dest('dist/js'));
 });
 
-gulp.task('views', function () {
-  return gulp.src([
-      '!src/jade/layout.jade',
-      'src/jade/*.jade'
-    ])
-    .pipe($.jade({
-      pretty: true
-    }))
-    .on('error', $.util.log)
-    .pipe(gulp.dest('dist'))
-    .pipe(browserSync.reload({stream: true}));
-});
+// gulp.task('views', function () {
+//   return gulp.src([
+//       '!src/jade/layout.jade',
+//       'src/jade/*.jade'
+//     ])
+//     .pipe($.jade({
+//       pretty: true
+//     }))
+//     .on('error', $.util.log)
+//     .pipe(gulp.dest('dist'))
+//     .pipe(browserSync.reload({stream: true}));
+// });
 
-gulp.task('images', function () {
-  return gulp.src('src/img/**/*')
-    .pipe($.imagemin({
-      svgoPlugins: [{
-        convertPathData: false
-      }]
-    }))
-    .pipe(gulp.dest('dist/img'));
-});
+// gulp.task('images', function () {
+//   return gulp.src('src/img/**/*')
+//     .pipe($.imagemin({
+//       svgoPlugins: [{
+//         convertPathData: false
+//       }]
+//     }))
+//     .pipe(gulp.dest('dist/img'));
+// });
 
 gulp.task('browser-sync', function () {
   browserSync({
@@ -110,7 +110,8 @@ gulp.task('clean', function (cb) {
 });
 
 
-gulp.task('build', ['check', 'scripts', 'styles', 'views', 'images']);
+// gulp.task('build', ['check', 'scripts', 'styles', 'views', 'images']);
+gulp.task('build', ['check', 'scripts', 'styles']);
 
 
 gulp.task('default', ['clean'], function () {

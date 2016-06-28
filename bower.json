@@ -1,6 +1,19 @@
 {
-  "name": "package",
+  "name": "anyjs",
   "version": "0.0.0",
+  "main": "dist/any.js",
+  "ignore": [
+    "src",
+    "test",
+    ".bowerrc",
+    ".editorconfig",
+    ".gitignore",
+    ".jshintrc",
+    "bower.json",
+    "gulpfile.js",
+    "package.json",
+    "README.md"
+  ],
   "dependencies": {
     "normalize.css": "~4.1.1"
   }
