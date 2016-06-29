@@ -20,6 +20,8 @@ any = (function () {
   var utils, events, collections, controls;
 
   utils = (function () {
+    var transitionEnd;
+
     function mixin(target, source) {
       function copyProperty(key) {
         target[key] = source[key];
@@ -32,8 +34,30 @@ any = (function () {
       }
     }
 
+    function findTransitionEnd() {
+      var transition, element = document.createElement("fake");
+
+      if (!transitionEnd) {
+        var transitions = {
+          "transition": "transitionend",
+          "OTransition": "oTransitionEnd",
+          "MozTransition": "transitionend",
+          "WebkitTransition": "webkitTransitionEnd"
+        };
+        for (transition in transitions) {
+          if (transitions.hasOwnProperty(transition)) {
+            if (element.style[transition]) {
+              return transitions[transition];
+            }
+          }
+        }
+      }
+      return transitionEnd || "transitionend";
+    }
+
     return {
-      mixin: mixin
+      mixin: mixin,
+      findTransitionEnd: findTransitionEnd
     };
   })();
 
@@ -84,6 +108,18 @@ any = (function () {
      */
     function ItemUpdated(sender, args) {
       Event.call(this, 'ItemUpdated', sender, args);
+    }
+
+    ItemUpdated.prototype = new Event();
+
+    /**
+     * TransitionEnd
+     * @param sender
+     * @param args
+     * @constructor
+     */
+    function TransitionEnd(sender, args) {
+      Event.call(this, 'TransitionEnd', sender, args);
     }
 
     ItemUpdated.prototype = new Event();
@@ -213,6 +249,7 @@ any = (function () {
       element.className = className;
       self.element = element;
       self.children = [];
+      self.transitionEnd = utils.findTransitionEnd();
     }
 
     utils.mixin(Control.prototype, events.EventTarget.prototype);
@@ -239,8 +276,11 @@ any = (function () {
         child.draw();
       }
     };
-    Control.prototype.show = function () {
+    Control.prototype.show = function (duration) {
       var self = this, element = self.element, classList = element.classList;
+      if (duration) {
+        element.style.opacity = 0;
+      }
       if (!classList.contains('show')) {
         if (classList.contains('hide')) {
           classList.remove('hide');
@@ -248,8 +288,11 @@ any = (function () {
         classList.add('show');
       }
     };
-    Control.prototype.hide = function () {
+    Control.prototype.hide = function (duration) {
       var self = this, element = self.element, classList = element.classList;
+      if (duration) {
+        element.style.opacity = 1;
+      }
       if (!classList.contains('hide')) {
         if (classList.contains('show')) {
           classList.remove('show');
@@ -257,14 +300,19 @@ any = (function () {
         classList.add('hide');
       }
     };
-    Control.prototype.moveTo = function (x, y) {
+    Control.prototype.moveTo = function (x, y, duration) {
       var self = this, element = self.element;
+      if (duration) {
+
+      }
       element.style.left = x + 'px';
       element.style.top = y + 'px';
     };
-
     Control.prototype.addClass = function (className) {
-      this.element.className += ' ' + className;
+      var self = this, element = self.element;
+      if (!element.classList.contains(className)) {
+        element.classList.add(className);
+      }
     };
 
     /**
