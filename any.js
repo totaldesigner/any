@@ -251,7 +251,6 @@ any = (function () {
       element.classList.add(className);
       self.element = element;
       self.children = [];
-      self.transitionEnd = utils.findTransitionEnd();
       self.html = null;
     }
 
