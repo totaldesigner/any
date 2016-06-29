@@ -1,6 +1,6 @@
 # AnyJS
 
-반응형 웹 사이트를 쉽게 제작하기 위한 솔루션
+The easiest responsive front-end framework for web development
 
 ## Inatall 
 ``` shell
