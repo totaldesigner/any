@@ -17,7 +17,7 @@ var CLASS_NAME = {
 
 var any = any || {};
 any = (function () {
-  var utils, events, collections, controls, animation;
+  var utils, events, collections, controls;
 
   utils = (function () {
     var transitionEnd;
@@ -42,35 +42,31 @@ any = (function () {
       return l.join('');
     }
 
-    animation = (function () {
-        if (animation) {
-          return animation;
-        }
-        else {
-          var transition, element = document.createElement('fake');
-          var transitions = {
-            transition: 'transitionend',
-            OTransition: 'oTransitionEnd',
-            MozTransition: 'transitionend',
-            WebkitTransition: 'webkitTransitionEnd'
-          };
-          for (transition in transitions) {
-            if (transitions.hasOwnProperty(transition)) {
-              if (element.style[transition]) {
-                return {
-                  transition: transition,
-                  transitionEnd: transitions[transition]
-                }
-              }
+    function findTransitionEnd() {
+      var transition, element = document.createElement('fake');
+
+      if (!transitionEnd) {
+        var transitions = {
+          transition: 'transitionend',
+          OTransition: 'oTransitionEnd',
+          MozTransition: 'transitionend',
+          WebkitTransition: 'webkitTransitionEnd'
+        };
+        for (transition in transitions) {
+          if (transitions.hasOwnProperty(transition)) {
+            if (element.style[transition]) {
+              return transitions[transition];
             }
           }
         }
-      })();
+      }
+      return transitionEnd || 'transitionend';
+    }
 
     return {
       mixin: mixin,
       format: format,
-      animation: animation
+      findTransitionEnd: findTransitionEnd
     };
   })();
 
@@ -249,9 +245,11 @@ any = (function () {
       var self = this, element;
       self.className = className;
       element = document.createElement(tagName || 'div');
+      element.classList.add('control');
       element.classList.add(className);
       self.element = element;
       self.children = [];
+      self.transitionEnd = utils.findTransitionEnd();
       self.html = null;
     }
 
@@ -280,48 +278,39 @@ any = (function () {
         child.draw();
         element.appendChild(child.element);
       }
+      self.show(1000);
     };
     Control.prototype.show = function (duration, complete) {
       var self = this, element = self.element, classList = element.classList;
       if (duration) {
-        element.style[animation.transition] = 'opacity 1s';
-        if (complete) {
-          element.addEventListener(animation.transitionEnd, function () {
-            element.removeEventListener(animation.transitionEnd);
-            element.style[animation.transition] = '';
-            complete();
-          });
-        }
+
       }
-      if (classList.contains('hidden')) {
-        classList.remove('hidden');
+      if (complete) {
+
+      }
+      if (!classList.contains('show')) {
+        classList.add('show');
       }
     };
     Control.prototype.hide = function (duration, complete) {
       var self = this, element = self.element, classList = element.classList;
       if (duration) {
-        element.style[animation.transition] = 'opacity 1s';
-        if (complete) {
-          element.addEventListener(animation.transitionEnd, function () {
-            element.removeEventListener(animation.transitionEnd);
-            element.style[animation.transition] = '';
-            complete();
-          });
-        }
+
       }
-      if (!classList.contains('hidden')) {
-        classList.add('hidden');
+      if (complete) {
+
+      }
+      if (classList.contains('show')) {
+        classList.remove('show');
       }
     };
     Control.prototype.moveTo = function (x, y, duration, complete) {
       var self = this, element = self.element;
       if (duration) {
-        if (complete) {
-          element.addEventListener(animation.transitionEnd, function () {
-            element.removeEventListener(animation.transitionEnd);
-            complete();
-          });
-        }
+
+      }
+      if (complete) {
+
       }
       element.style.left = x + 'px';
       element.style.top = y + 'px';
@@ -341,8 +330,8 @@ any = (function () {
      * @param html
      * @param className
      * @param tagName
-     * @constructor
-     */
+       * @constructor
+       */
     function Item(html, className, tagName) {
       var self = this;
       Control.call(self, className || CLASS_NAME.ITEM, tagName);
@@ -356,7 +345,7 @@ any = (function () {
      * @param html
      * @param className
      * @constructor
-     */
+       */
     function ListViewItem(html, className) {
       var self = this;
       Item.call(self, html, className || CLASS_NAME.LIST_VIEW_ITEM, 'li');
@@ -369,8 +358,8 @@ any = (function () {
      * @param list
      * @param itemTemplate
      * @param className
-     * @constructor
-     */
+       * @constructor
+       */
     function ListView(list, itemTemplate, className) {
       var self = this;
       Control.call(self, className || CLASS_NAME.LIST_VIEW, 'ul');
