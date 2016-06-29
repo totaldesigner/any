@@ -36,7 +36,7 @@ gulp.task('styles', function () {
 });
 
 gulp.task('scripts', function () {
-  return gulp.src('src/js/*.js')
+  return gulp.src(['src/js/any.js', 'src/js/any-ui.js'])
     .pipe(concat('any.js'))
     //.pipe(uglify())
     .pipe(gulp.dest('dist/js'));

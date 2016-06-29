@@ -11,7 +11,7 @@ if (typeof any === 'undefined') {
 (function () {
   var Page, Layer, Menu, List, Box, Item, ListView,
     page, layer, menu, list, header, photo, pickup, info, footer,
-    headerInner, footerInner, headerLogo, headerMenu, logo, img, copyright,
+    headerInner, footerInner, headerLogo, headerMenu, img, copyright,
     pickup1, pickup2, pickup3, news, infoMain, infoSub, listMain, listSub, listViewMain, listViewSub;
 
   Page = any.controls.Page;
@@ -36,16 +36,10 @@ if (typeof any === 'undefined') {
 
   page = new Page();
   layer = new Layer();
-  menu = new Menu(list, function (item) {
-    var a = document.createElement('a');
-    a.appendChild(document.createTextNode(item.name));
-    return a;
-  });
+  menu = new Menu(list, '<a>{name}</a>');
 
   // header
-  logo = document.createElement('div').appendChild(document.createElement('h1')
-    .appendChild(document.createTextNode('아버지는 어떻게 살아야 하는가?')));
-  headerLogo = new Box(new Item(logo));
+  headerLogo = new Box(new Item('<div><h1>아버지는 어떻게 살아야 하는가?</h1></div>'));
   headerMenu = new Box(menu);
   headerInner = new Box();
   headerInner.addClass('header-inner horizontal');
@@ -57,9 +51,7 @@ if (typeof any === 'undefined') {
   layer.append(header);
 
   // photo
-  img = document.createElement('img');
-  img.setAttribute('src', 'header.jpg');
-  photo = new Box(new Item(document.createElement('div').appendChild(img)));
+  photo = new Box(new Item('<div><img src="header.jpg"/></div>'));
   photo.addClass('photo');
   layer.append(photo);
 
@@ -84,12 +76,7 @@ if (typeof any === 'undefined') {
   }, {
     time: '09/15', content: '그래프 표시의 변경 방식을 쉽게 바꿨습니다.'
   }]);
-  listViewMain = new ListView(listMain, function (item) {
-    var a;
-    a = document.createElement('a');
-    a.innerHTML = '<time>' + item.time + '</time><div>' + item.content + '</div>';
-    return a;
-  });
+  listViewMain = new ListView(listMain, '<a><time>{time}</time><div>{comtent}</div></a>');
   listSub = new List([{
     shortClass: 'tw', class: 'twitter', name: 'Twitter'
   }, {
@@ -97,13 +84,7 @@ if (typeof any === 'undefined') {
   }, {
     shortClass: 'gp', class: 'google-plus', name: 'Google+'
   }]);
-  listViewSub = new ListView(listSub, function (item) {
-    var a;
-    a = document.createElement('a');
-    a.className = 'follow-' + item.shortClass;
-    a.innerHTML = '<i class="fa fa-fw fa-' + item.class + '"></i>' + item.name;
-    return a;
-  });
+  listViewSub = new ListView(listSub, '<a class="follow-{shortClass}"><i class="fa fa-fw fa-{class}"></i>{name}</a>');
   news = new Box(listViewMain);
   news.addClass('news');
   infoMain = new Box(news);
@@ -117,10 +98,7 @@ if (typeof any === 'undefined') {
   layer.append(info);
 
   // footer
-  copyright = document.createElement('div');
-  copyright.className = 'copyright';
-  copyright.innerHTML = '<p>Copyright© totaldesigner</p>';
-  footerInner = new Box(new Item(copyright));
+  footerInner = new Box(new Item('<div class="copyright"><p>Copyright© totaldesigner</p></div>'));
   footerInner.addClass('footer-inner');
   footer = new Box(footerInner);
   footer.addClass('footer');
