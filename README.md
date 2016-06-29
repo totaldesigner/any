@@ -27,7 +27,6 @@ git push origin master --tags
 * Deleting a tag
 ``` shell
 git tag -d v0.0.1
-git push origin master --tags
 git push origin :refs/tags/v0.0.1
 ```
 * Cleaning and installation
