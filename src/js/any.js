@@ -279,7 +279,6 @@ any = (function () {
         child.draw();
         element.appendChild(child.element);
       }
-      self.show(1000);
     };
     Control.prototype.show = function (duration, complete) {
       var self = this, element = self.element, classList = element.classList;
