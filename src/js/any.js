@@ -17,118 +17,134 @@ var CLASS_NAME = {
 
 var any = any || {};
 any = (function () {
-  var collections, controls;
+  var utils, events, collections, controls;
 
-  function mixin(target, source) {
-    function copyProperty(key) {
-      target[key] = source[key];
-    }
-
-    if (arguments.length > 2) {
-      Array.prototype.slice.call(arguments, 2).forEach(copyProperty);
-    } else {
-      Object.keys(source).forEach(copyProperty);
-    }
-  }
-
-  /**
-   * Event
-   * @param name
-   * @param sender
-   * @param args
-   * @constructor
-   */
-  function Event(name, sender, args) {
-    var self = this;
-    self.name = name;
-    self.sender = sender;
-    self.args = args;
-  }
-
-  /**
-   * ItemAdded
-   * @param sender
-   * @param args
-   * @constructor
-   */
-  function ItemAdded(sender, args) {
-    Event.call(this, 'ItemAdded', sender, args);
-  }
-
-  ItemAdded.prototype = new Event();
-
-  /**
-   * ItemRemoved
-   * @param sender
-   * @param args
-   * @constructor
-   */
-  function ItemRemoved(sender, args) {
-    Event.call(this, 'ItemRemoved', sender, args);
-  }
-
-  ItemRemoved.prototype = new Event();
-
-  /**
-   * ItemUpdated
-   * @param sender
-   * @param args
-   * @constructor
-   */
-  function ItemUpdated(sender, args) {
-    Event.call(this, 'ItemUpdated', sender, args);
-  }
-
-  ItemUpdated.prototype = new Event();
-
-  /**
-   * EventTarget
-   * @constructor
-   */
-  function EventTarget() {
-  }
-
-  EventTarget.prototype.addEventListener = function (name, callback) {
-    var self = this;
-    if (!self.listeners) {
-      self.listeners = {};
-    }
-    if (!(name in self.listeners)) {
-      self.listeners[name] = [];
-    }
-    self.listeners[name].push(callback);
-  };
-  EventTarget.prototype.removeEventListener = function (name, callback) {
-    var self = this, stack;
-    if (!self.listeners) {
-      self.listeners = {};
-    }
-    if (!(name in self.listeners)) {
-      return false;
-    }
-    stack = self.listeners[name];
-    if (callback) {
-      for (var i = 0, l = stack.length; i < l; i++) {
-        if (stack[i] === callback) {
-          stack.splice(i, 1);
-          return self.removeEventListener(name, callback);
-        }
+  utils = (function () {
+    function mixin(target, source) {
+      function copyProperty(key) {
+        target[key] = source[key];
       }
-    } else {
-      delete self.listeners[name];
+
+      if (arguments.length > 2) {
+        Array.prototype.slice.call(arguments, 2).forEach(copyProperty);
+      } else {
+        Object.keys(source).forEach(copyProperty);
+      }
     }
-  };
-  EventTarget.prototype.dispatchEvent = function (event) {
-    var self = this, stack;
-    if (!(event.name in self.listeners)) {
-      return;
+
+    return {
+      mixin: mixin
+    };
+  })();
+
+  events = (function () {
+    /**
+     * Event
+     * @param name
+     * @param sender
+     * @param args
+     * @constructor
+     */
+    function Event(name, sender, args) {
+      var self = this;
+      self.name = name;
+      self.sender = sender;
+      self.args = args;
     }
-    stack = self.listeners[event.name];
-    event.target = self;
-    for (var i = 0, l = stack.length; i < l; i++) {
-      stack[i].call(self, event);
+
+    /**
+     * ItemAdded
+     * @param sender
+     * @param args
+     * @constructor
+     */
+    function ItemAdded(sender, args) {
+      Event.call(this, 'ItemAdded', sender, args);
     }
-  };
+
+    ItemAdded.prototype = new Event();
+
+    /**
+     * ItemRemoved
+     * @param sender
+     * @param args
+     * @constructor
+     */
+    function ItemRemoved(sender, args) {
+      Event.call(this, 'ItemRemoved', sender, args);
+    }
+
+    ItemRemoved.prototype = new Event();
+
+    /**
+     * ItemUpdated
+     * @param sender
+     * @param args
+     * @constructor
+     */
+    function ItemUpdated(sender, args) {
+      Event.call(this, 'ItemUpdated', sender, args);
+    }
+
+    ItemUpdated.prototype = new Event();
+
+    /**
+     * EventTarget
+     * @constructor
+     */
+    function EventTarget() {
+    }
+
+    EventTarget.prototype.addEventListener = function (name, callback) {
+      var self = this;
+      if (!self.listeners) {
+        self.listeners = {};
+      }
+      if (!(name in self.listeners)) {
+        self.listeners[name] = [];
+      }
+      self.listeners[name].push(callback);
+    };
+    EventTarget.prototype.removeEventListener = function (name, callback) {
+      var self = this, stack;
+      if (!self.listeners) {
+        self.listeners = {};
+      }
+      if (!(name in self.listeners)) {
+        return false;
+      }
+      stack = self.listeners[name];
+      if (callback) {
+        for (var i = 0, l = stack.length; i < l; i++) {
+          if (stack[i] === callback) {
+            stack.splice(i, 1);
+            return self.removeEventListener(name, callback);
+          }
+        }
+      } else {
+        delete self.listeners[name];
+      }
+    };
+    EventTarget.prototype.dispatchEvent = function (event) {
+      var self = this, stack;
+      if (!(event.name in self.listeners)) {
+        return;
+      }
+      stack = self.listeners[event.name];
+      event.target = self;
+      for (var i = 0, l = stack.length; i < l; i++) {
+        stack[i].call(self, event);
+      }
+    };
+
+    return {
+      Event: Event,
+      EventTarget: EventTarget,
+      ItemAdded: ItemAdded,
+      ItemRemoved: ItemRemoved,
+      ItemUpdated: ItemUpdated
+    };
+  })();
 
   /**
    * collections
@@ -144,7 +160,7 @@ any = (function () {
     }
 
     Collection.prototype = [];
-    mixin(Collection.prototype, EventTarget.prototype);
+    utils.mixin(Collection.prototype, events.EventTarget.prototype);
     Collection.prototype.items = function (index) {
       return this[index];
     };
@@ -164,17 +180,17 @@ any = (function () {
     List.prototype.add = function (item) {
       var self = this;
       self.push(item);
-      self.dispatchEvent(new ItemAdded(self, {item: item}));
+      self.dispatchEvent(new events.ItemAdded(self, {item: item}));
     };
     List.prototype.removeAt = function (index) {
       var self = this;
       self.splice(index, 1);
-      self.dispatchEvent(new ItemRemoved(self, {index: index}));
+      self.dispatchEvent(new events.ItemRemoved(self, {index: index}));
     };
     List.prototype.update = function (index, item) {
       var self = this;
       self[index] = item;
-      self.dispatchEvent(new ItemUpdated(self, {index: index, item: item}));
+      self.dispatchEvent(new events.ItemUpdated(self, {index: index, item: item}));
     };
     return {
       List: List
@@ -196,33 +212,57 @@ any = (function () {
       element = document.createElement('div');
       element.className = className;
       self.element = element;
-      self.items = [];
+      self.children = [];
     }
 
-    mixin(Control.prototype, EventTarget.prototype);
+    utils.mixin(Control.prototype, events.EventTarget.prototype);
     Control.prototype.append = function (item) {
       var self = this;
-      self.items.push(item);
+      self.children.push(item);
     };
     Control.prototype.empty = function () {
       var self = this, element = self.element;
       while (element.hasChildNodes()) {
         element.removeChild(element.firstChild);
       }
-      self.items = [];
+      self.children = [];
     };
     Control.prototype.draw = function () {
-      var self = this, item, items = self.items, element = self.element;
+      var self = this, child, children = self.children, element = self.element;
       //self.empty();
-      for (var i = 0, l = items.length; i < l; i++) {
-        item = items[i];
+      for (var i = 0, l = children.length; i < l; i++) {
+        child = children[i];
         if (element.className.indexOf('horizontal') > -1) {
-          item.element.style.width = (100 / l) + '%';
+          child.element.style.width = (100 / l) + '%';
         }
-        element.appendChild(item.element);
-        item.draw();
+        element.appendChild(child.element);
+        child.draw();
       }
     };
+    Control.prototype.show = function () {
+      var self = this, element = self.element, classList = element.classList;
+      if (!classList.contains('show')) {
+        if (classList.contains('hide')) {
+          classList.remove('hide');
+        }
+        classList.add('show');
+      }
+    };
+    Control.prototype.hide = function () {
+      var self = this, element = self.element, classList = element.classList;
+      if (!classList.contains('hide')) {
+        if (classList.contains('show')) {
+          classList.remove('show');
+        }
+        classList.add('hide');
+      }
+    };
+    Control.prototype.moveTo = function (x, y) {
+      var self = this, element = self.element;
+      element.style.left = x + 'px';
+      element.style.top = y + 'px';
+    };
+
     Control.prototype.addClass = function (className) {
       this.element.className += ' ' + className;
     };
@@ -234,10 +274,13 @@ any = (function () {
     function Item(element) {
       var self = this;
       self.element = element;
-      self.items = [];
     }
 
     Item.prototype = new Control();
+    Item.prototype.draw = function () {
+      var self = this;
+      self.element.appendChild(child);
+    };
 
     /**
      * ListViewItem
@@ -252,10 +295,6 @@ any = (function () {
     }
 
     ListViewItem.prototype = new Item();
-    ListViewItem.prototype.draw = function (child) {
-      var self = this;
-      self.element.appendChild(child);
-    };
 
     /**
      * ListView
@@ -333,7 +372,7 @@ any = (function () {
       var self = this;
       Control.call(self, CLASS_NAME.BOX);
       if (child) {
-        self.items.push(child);
+        self.children.push(child);
       }
     }
 
@@ -378,6 +417,8 @@ any = (function () {
   })();
 
   return {
+    utils: utils,
+    events: events,
     collections: collections,
     controls: controls
   };
