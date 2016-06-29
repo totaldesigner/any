@@ -382,16 +382,6 @@ any = (function () {
     }
 
     ListView.prototype = new Control();
-    //ListView.prototype.draw = function () {
-    //  var self = this, list = self.list, item, element = self.element,
-    //    itemTemplate = self.itemTemplate;
-    //  self.empty();
-    //  for (var i = 0, l = list.length; i < l; i++) {
-    //    item = new ListViewItem(self.className + '-item');
-    //    item.draw(itemTemplate(list[i]));
-    //    element.appendChild(item.element);
-    //  }
-    //};
     ListView.prototype.onItemAdded = function (e) {
       var self = this, args, item;
       args = e.args;
