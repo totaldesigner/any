@@ -449,22 +449,42 @@ any = (function () {
 
     Layer.prototype = new Control();
 
-    function Page() {
-      var self = this;
-      Control.call(self, CLASS_NAME.PAGE);
-    }
-
     /**
      * Page
      * @type {Control}
      */
+    function Page() {
+      var self = this;
+      Control.call(self, CLASS_NAME.PAGE);
+    }
     Page.prototype = new Control();
     Page.prototype.draw = function () {
       var self = this, body;
       body = document.getElementsByTagName('body')[0];
+      body.addEventListener('keydown', self.onKeyDown);
       body.className = 'any';
       Control.prototype.draw.call(self);
       body.appendChild(self.element);
+    };
+    Page.prototype.removeTopLayer = function() {
+      var self = this, topLayer, children = self.children;
+      topLayer = children.splice(children.length - 1, 1);
+      self.element.removeChild(topLayer.element);
+    };
+    Page.prototype.onKeyDown = function (e) {
+      var self = this, keyCode = e.keyCode || e.which;
+      if (keyCode == 8 /* BACKSPACE */) {
+        self.removeTopLayer();
+        if (e.stopPropagation) {
+          e.stopPropagation();
+        }
+        if (!e.cancelBubble) {
+          e.cancelBubble = true;
+        }
+        if (e.preventDefault) {
+          e.preventDefault();
+        }
+      }
     };
 
     return {
