@@ -1,85 +1,4 @@
 /**
- * Created by mspark on 6/29/16.
- */
-/*jshint browser:true */
-/*globals any:false */
-'use strict';
-
-if (typeof any === 'undefined') {
-  throw new Error('any.ani\'s JavaScript requires any');
-}
-
-any.ani = (function () {
-  var utils, events;
-  utils = any.events;
-  events = any.utils;
-
-  function Animation() {
-
-  }
-  utils.mixin(Animation.prototype, events.EventTarget);
-
-  return {
-    Animation: Animation
-  };
-}());
-
-/**
- * Created by mspark on 16. 6. 25.
- */
-/*jshint browser:true */
-/*globals any:false */
-'use strict';
-
-if (typeof any === 'undefined') {
-  throw new Error('any.ui\'s JavaScript requires any');
-}
-
-var UI_CLASS_NAME = {
-  MENU: 'menu',
-  MENU_ITEM: 'menu-item'
-};
-
-any.ui = (function () {
-  var controls, ListView, Layer;
-  controls = any.controls;
-  ListView = controls.ListView;
-  Layer = controls.Layer;
-
-  function Menu(list, itemTemplate) {
-    var self = this;
-    ListView.call(self, list, itemTemplate, UI_CLASS_NAME.MENU);
-  }
-
-  Menu.prototype = new ListView();
-
-  function ContextMenu() {
-
-  }
-
-  ContextMenu.prototype = new Menu();
-
-  function Dialog() {
-
-  }
-
-  Dialog.prototype = new Layer();
-
-  function Pagination() {
-
-  }
-
-  Pagination.prototype = new ListView();
-
-  return {
-    ContextMenu: ContextMenu,
-    Dialog: Dialog,
-    Menu: Menu,
-    Pagination: Pagination
-  };
-}());
-
-/**
  * Created by mspark on 6/22/16.
  */
 /*jshint browser:true */
@@ -98,9 +17,35 @@ var CLASS_NAME = {
 
 var any = any || {};
 any = (function () {
-  var utils, events, collections, controls;
+  var utils, events, collections, controls, animation;
+
+  animation = (function () {
+    if (animation) {
+      return animation;
+    }
+    else {
+      var transition, element = document.createElement('fake');
+      var transitions = {
+        transition: 'transitionend',
+        OTransition: 'oTransitionEnd',
+        MozTransition: 'transitionend',
+        WebkitTransition: 'webkitTransitionEnd'
+      };
+      for (transition in transitions) {
+        if (transitions.hasOwnProperty(transition)) {
+          if (element.style[transition]) {
+            return {
+              transition: transition,
+              transitionEnd: transitions[transition]
+            };
+          }
+        }
+      }
+    }
+  })();
 
   utils = (function () {
+
     function mixin(target, source) {
       function copyProperty(key) {
         target[key] = source[key];
@@ -113,8 +58,17 @@ any = (function () {
       }
     }
 
+    function format(s, context) {
+      var l = s.split(/\{(.+?)\}/);
+      for (var i = 1; i < l.length; i += 2) {
+        l[i] = context[l[i]];
+      }
+      return l.join('');
+    }
+
     return {
-      mixin: mixin
+      mixin: mixin,
+      format: format
     };
   })();
 
@@ -286,73 +240,128 @@ any = (function () {
     /**
      * Control
      * @param className
+     * @param tagName
      * @constructor
      */
-    function Control(className) {
+    function Control(className, tagName) {
       var self = this, element;
-      element = document.createElement('div');
-      element.className = className;
+      self.className = className;
+      element = document.createElement(tagName || 'div');
+      element.classList.add('control');
+      element.classList.add(className);
       self.element = element;
-      self.items = [];
+      self.children = [];
+      self.html = null;
     }
 
     utils.mixin(Control.prototype, events.EventTarget.prototype);
-    Control.prototype.append = function (item) {
+    Control.prototype.append = function (child) {
       var self = this;
-      self.items.push(item);
+      self.children.push(child);
     };
     Control.prototype.empty = function () {
       var self = this, element = self.element;
       while (element.hasChildNodes()) {
         element.removeChild(element.firstChild);
       }
-      self.items = [];
     };
     Control.prototype.draw = function () {
-      var self = this, item, items = self.items, element = self.element;
-      //self.empty();
-      for (var i = 0, l = items.length; i < l; i++) {
-        item = items[i];
-        if (element.className.indexOf('horizontal') > -1) {
-          item.element.style.width = (100 / l) + '%';
+      var self = this, child, children = self.children, element = self.element;
+      self.empty();
+      if (self.html) {
+        element.innerHTML = self.html;
+      }
+      for (var i = 0, l = children.length; i < l; i++) {
+        child = children[i];
+        if (element.classList.contains('horizontal')) {
+          child.element.style.width = (100 / l) + '%';
         }
-        element.appendChild(item.element);
-        item.draw();
+        child.draw();
+        element.appendChild(child.element);
       }
     };
+    Control.prototype.show = function (duration, complete) {
+      var self = this, element = self.element, classList = element.classList;
+      if (duration) {
+        element.style[animation.transition] = 'opacity 1s';
+        if (complete) {
+          element.addEventListener(animation.transitionEnd, function () {
+            element.removeEventListener(animation.transitionEnd);
+            element.style[animation.transition] = '';
+            complete();
+          });
+        }
+      }
+      if (classList.contains('hidden')) {
+        classList.remove('hidden');
+      }
+    };
+    Control.prototype.hide = function (duration, complete) {
+      var self = this, element = self.element, classList = element.classList;
+      if (duration) {
+        element.style[animation.transition] = 'opacity 1s';
+        if (complete) {
+          element.addEventListener(animation.transitionEnd, function () {
+            element.removeEventListener(animation.transitionEnd);
+            element.style[animation.transition] = '';
+            complete();
+          });
+        }
+      }
+      if (!classList.contains('hidden')) {
+        classList.add('hidden');
+      }
+    };
+    Control.prototype.moveTo = function (x, y, duration, complete) {
+      var self = this, element = self.element;
+      if (duration) {
+        if (complete) {
+          element.addEventListener(animation.transitionEnd, function () {
+            element.removeEventListener(animation.transitionEnd);
+            complete();
+          });
+        }
+      }
+      element.style.left = x + 'px';
+      element.style.top = y + 'px';
+    };
     Control.prototype.addClass = function (className) {
-      this.element.className += ' ' + className;
+      var self = this, element = self.element, classList;
+      classList = className.split(' ');
+      for (var i = 0, l = classList.length; i < l; i++) {
+        if (!element.classList.contains(classList[i])) {
+          element.classList.add(classList[i]);
+        }
+      }
     };
 
     /**
      * Item
+     * @param html
+     * @param className
+     * @param tagName
      * @constructor
      */
-    function Item(element) {
+    function Item(html, className, tagName) {
       var self = this;
-      self.element = element;
-      self.items = [];
+      Control.call(self, className || CLASS_NAME.ITEM, tagName);
+      self.html = html;
     }
 
     Item.prototype = new Control();
 
     /**
      * ListViewItem
+     * @param html
      * @param className
      * @constructor
      */
-    function ListViewItem(className) {
-      var self = this, element;
-      element = document.createElement('li');
-      element.className = className;
-      self.element = element;
+    function ListViewItem(html, className) {
+      var self = this;
+      Item.call(self, html, className || CLASS_NAME.LIST_VIEW_ITEM, 'li');
     }
 
     ListViewItem.prototype = new Item();
-    ListViewItem.prototype.draw = function (child) {
-      var self = this;
-      self.element.appendChild(child);
-    };
 
     /**
      * ListView
@@ -362,11 +371,8 @@ any = (function () {
      * @constructor
      */
     function ListView(list, itemTemplate, className) {
-      var self = this, element;
-      self.className = className || CLASS_NAME.LIST_VIEW;
-      element = document.createElement('ul');
-      element.className = self.className;
-      self.element = element;
+      var self = this;
+      Control.call(self, className || CLASS_NAME.LIST_VIEW, 'ul');
       if (list) {
         list.addEventListener('ItemAdded', function (e) {
           self.onItemAdded(e);
@@ -379,25 +385,19 @@ any = (function () {
         });
         self.itemTemplate = itemTemplate;
         self.list = list;
+        for (var i = 0, l = list.length; i < l; i++) {
+          self.append(new ListViewItem(utils.format(itemTemplate, list[i]), self.className + '-item'));
+        }
       }
     }
 
     ListView.prototype = new Control();
-    ListView.prototype.draw = function () {
-      var self = this, list = self.list, item, element = self.element,
-        itemTemplate = self.itemTemplate;
-      //self.empty();
-      for (var i = 0, l = list.length; i < l; i++) {
-        item = new ListViewItem(self.className + '-item');
-        item.draw(itemTemplate(list[i]));
-        element.appendChild(item.element);
-      }
-    };
     ListView.prototype.onItemAdded = function (e) {
       var self = this, args, item;
       args = e.args;
-      item = new ListViewItem(self.className + '-item');
-      item.draw(self.itemTemplate(args.item));
+      item = new ListViewItem(utils.format(self.itemTemplate, args.item), self.className + '-item');
+      item.draw();
+      self.children.push(item);
       self.element.appendChild(item.element);
     };
     ListView.prototype.onItemRemoved = function (e) {
@@ -405,7 +405,11 @@ any = (function () {
       args = e.args;
       index = args.index;
       if (!isNaN(index)) {
-        child = document.querySelector('.' + self.className + '-item:nth-child(' + (index + 1) + ')');
+        child = document.querySelector(utils.format('.{className}-item:nth-child({index})', {
+          className: self.className,
+          index: index + 1
+        }));
+        self.children.splice(index, 1);
         self.element.removeChild(child);
       }
     };
@@ -414,9 +418,13 @@ any = (function () {
       args = e.args;
       index = args.index;
       if (!isNaN(index)) {
-        child = document.querySelector('.' + self.className + '-item:nth-child(' + (index + 1) + ')');
-        item = new ListViewItem(self.className + '-item');
-        item.draw(self.itemTemplate(args.item));
+        child = document.querySelector(utils.format('.{className}-item:nth-child({index})', {
+          className: self.className,
+          index: index + 1
+        }));
+        item = new ListViewItem(utils.format(self.itemTemplate, args.item), self.className + '-item');
+        item.draw();
+        self.children[index] = item;
         self.element.replaceChild(item.element, child);
       }
     };
@@ -430,7 +438,7 @@ any = (function () {
       var self = this;
       Control.call(self, CLASS_NAME.BOX);
       if (child) {
-        self.items.push(child);
+        self.children.push(child);
       }
     }
 
@@ -447,22 +455,44 @@ any = (function () {
 
     Layer.prototype = new Control();
 
-    function Page() {
-      var self = this;
-      Control.call(self, CLASS_NAME.PAGE);
-    }
-
     /**
      * Page
      * @type {Control}
      */
+    function Page() {
+      var self = this;
+      Control.call(self, CLASS_NAME.PAGE);
+    }
     Page.prototype = new Control();
     Page.prototype.draw = function () {
       var self = this, body;
       body = document.getElementsByTagName('body')[0];
       body.className = 'any';
+      body.addEventListener('keydown', self.onKeyDown);
       Control.prototype.draw.call(self);
       body.appendChild(self.element);
+    };
+    Page.prototype.removeTopLayer = function() {
+      var self = this, topLayer, children = self.children;
+      if (children.length > 0) {
+        topLayer = children.splice(children.length - 1, 1);
+        self.element.removeChild(topLayer.element);
+      }
+    };
+    Page.prototype.onKeyDown = function (e) {
+      var self = this, keyCode = e.keyCode || e.which;
+      if (keyCode == 8 /* BACKSPACE */) {
+        self.removeTopLayer();
+        if (e.stopPropagation) {
+          e.stopPropagation();
+        }
+        if (!e.cancelBubble) {
+          e.cancelBubble = true;
+        }
+        if (e.preventDefault) {
+          e.preventDefault();
+        }
+      }
     };
 
     return {
@@ -481,3 +511,58 @@ any = (function () {
     controls: controls
   };
 })(any);
+
+/**
+ * Created by mspark on 16. 6. 25.
+ */
+/*jshint browser:true */
+/*globals any:false */
+'use strict';
+
+if (typeof any === 'undefined') {
+  throw new Error('any.ui\'s JavaScript requires any');
+}
+
+var UI_CLASS_NAME = {
+  MENU: 'menu',
+  MENU_ITEM: 'menu-item'
+};
+
+any.ui = (function () {
+  var controls, ListView, Layer;
+  controls = any.controls;
+  ListView = controls.ListView;
+  Layer = controls.Layer;
+
+  function Menu(list, itemTemplate) {
+    var self = this;
+    ListView.call(self, list, itemTemplate, UI_CLASS_NAME.MENU);
+  }
+
+  Menu.prototype = new ListView();
+
+  function ContextMenu() {
+
+  }
+
+  ContextMenu.prototype = new Menu();
+
+  function Dialog() {
+
+  }
+
+  Dialog.prototype = new Layer();
+
+  function Pagination() {
+
+  }
+
+  Pagination.prototype = new ListView();
+
+  return {
+    ContextMenu: ContextMenu,
+    Dialog: Dialog,
+    Menu: Menu,
+    Pagination: Pagination
+  };
+}());

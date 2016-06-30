@@ -1,4 +1,3 @@
-
 .any .layer.dialog {
   display: none;
   overflow: hidden;
@@ -460,6 +459,10 @@ textarea {
 body {
   margin: 0;
   font-family: '맑은 고딕', 'Apple SD Gothic Neo', sans-serif;
+}
+.any .hidden {
+  display: none;
+  opacity: 0;
 }
 .any ul {
   list-style: none;
