@@ -420,7 +420,7 @@ any = (function () {
             children = self.element.querySelectorAll('.' + self.className + '-item');
             children.addEventListener('click', function(e) {
                 self.dispatchEvent('MenuItemSelected', new events.MenuItemSelected(self, e));
-            })
+            });
         };
         ListView.prototype.onItemAdded = function (e) {
             var self = this, args, item;

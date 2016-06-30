@@ -414,14 +414,6 @@ any = (function () {
         }
 
         ListView.prototype = new Control();
-        ListView.prototype.draw = function() {
-            var self = this, children;
-            Control.prototype.draw.call(self);
-            children = self.element.querySelectorAll('.' + self.className + '-item');
-            children.addEventListener('click', function(e) {
-                self.dispatchEvent('MenuItemSelected', new events.MenuItemSelected(self, e));
-            });
-        };
         ListView.prototype.onItemAdded = function (e) {
             var self = this, args, item;
             args = e.args;
@@ -471,6 +463,14 @@ any = (function () {
         }
 
         Menu.prototype = new ListView();
+        Menu.prototype.draw = function() {
+            var self = this, children;
+            ListView.prototype.draw.call(self);
+            children = self.element.querySelectorAll('.' + self.className + '-item');
+            children.addEventListener('click', function(e) {
+                self.dispatchEvent('MenuItemSelected', new events.MenuItemSelected(self, e));
+            });
+        };
 
         /**
          * ContextMenu
