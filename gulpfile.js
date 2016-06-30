@@ -1,11 +1,15 @@
 'use strict';
 
+var fs = require('fs');
 var gulp = require('gulp');
 var browserSync = require('browser-sync');
 //var mocha = require('gulp-mocha');
 var concat = require('gulp-concat');
 var cssmin = require('gulp-cssmin');
+var git = require('gulp-git');
+var tagVersion = require('gulp-tag-version');
 var mochaPhantomJS = require('gulp-mocha-phantomjs');
+var shell = require('gulp-shell');
 var uglify = require('gulp-uglify');
 //var util = require('gulp-util');
 
@@ -21,8 +25,8 @@ gulp.task('styles', function () {
   ];
   return gulp.src('src/less/*.less')
     .pipe($.less({
-        paths: ['bower_components']
-      })
+      paths: ['bower_components']
+    })
       .on('error', $.util.log))
     .pipe($.postcss([
       require('autoprefixer-core')({
@@ -44,9 +48,9 @@ gulp.task('scripts', function () {
 
 gulp.task('views', function () {
   return gulp.src([
-      '!src/jade/layout.jade',
-      'src/jade/*.jade'
-    ])
+    '!src/jade/layout.jade',
+    'src/jade/*.jade'
+  ])
     .pipe($.jade({
       pretty: true
     }))
@@ -93,9 +97,19 @@ gulp.task('check', function () {
     .pipe($.jshint.reporter('fail'));
 });
 
-gulp.task('release', function () {
+gulp.task('copy', function () {
   return gulp.src(['dist/js/any.js', 'dist/css/any.css'])
     .pipe(gulp.dest(''));
+});
+
+gulp.task('release', function () {
+  var data = fs.readFileSync('./bower.json');
+  var version = JSON.parse(data.toString()).version;
+  return gulp.src(['./bower.json'])
+    .pipe(shell([
+      'git tag -d v' + version,
+      'git push origin :refs/tags/v' + version]))
+    .pipe(tagVersion({version: version}));
 });
 
 gulp.task('clean', function (cb) {
@@ -103,7 +117,7 @@ gulp.task('clean', function (cb) {
   del(['dist'], cb);
 });
 
-gulp.task('build', ['check', 'scripts', 'styles']);
+gulp.task('build', ['check', 'scripts', 'styles', 'copy']);
 
 gulp.task('default', ['clean'], function () {
   gulp.start('watch');

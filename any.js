@@ -1,4 +1,85 @@
 /**
+ * Created by mspark on 6/29/16.
+ */
+/*jshint browser:true */
+/*globals any:false */
+'use strict';
+
+if (typeof any === 'undefined') {
+  throw new Error('any.ani\'s JavaScript requires any');
+}
+
+any.ani = (function () {
+  var utils, events;
+  utils = any.events;
+  events = any.utils;
+
+  function Animation() {
+
+  }
+  utils.mixin(Animation.prototype, events.EventTarget);
+
+  return {
+    Animation: Animation
+  };
+}());
+
+/**
+ * Created by mspark on 16. 6. 25.
+ */
+/*jshint browser:true */
+/*globals any:false */
+'use strict';
+
+if (typeof any === 'undefined') {
+  throw new Error('any.ui\'s JavaScript requires any');
+}
+
+var UI_CLASS_NAME = {
+  MENU: 'menu',
+  MENU_ITEM: 'menu-item'
+};
+
+any.ui = (function () {
+  var controls, ListView, Layer;
+  controls = any.controls;
+  ListView = controls.ListView;
+  Layer = controls.Layer;
+
+  function Menu(list, itemTemplate) {
+    var self = this;
+    ListView.call(self, list, itemTemplate, UI_CLASS_NAME.MENU);
+  }
+
+  Menu.prototype = new ListView();
+
+  function ContextMenu() {
+
+  }
+
+  ContextMenu.prototype = new Menu();
+
+  function Dialog() {
+
+  }
+
+  Dialog.prototype = new Layer();
+
+  function Pagination() {
+
+  }
+
+  Pagination.prototype = new ListView();
+
+  return {
+    ContextMenu: ContextMenu,
+    Dialog: Dialog,
+    Menu: Menu,
+    Pagination: Pagination
+  };
+}());
+
+/**
  * Created by mspark on 6/22/16.
  */
 /*jshint browser:true */
@@ -17,35 +98,9 @@ var CLASS_NAME = {
 
 var any = any || {};
 any = (function () {
-  var utils, events, collections, controls, animation;
-
-  animation = (function () {
-    if (animation) {
-      return animation;
-    }
-    else {
-      var transition, element = document.createElement('fake');
-      var transitions = {
-        transition: 'transitionend',
-        OTransition: 'oTransitionEnd',
-        MozTransition: 'transitionend',
-        WebkitTransition: 'webkitTransitionEnd'
-      };
-      for (transition in transitions) {
-        if (transitions.hasOwnProperty(transition)) {
-          if (element.style[transition]) {
-            return {
-              transition: transition,
-              transitionEnd: transitions[transition]
-            };
-          }
-        }
-      }
-    }
-  })();
+  var utils, events, collections, controls;
 
   utils = (function () {
-
     function mixin(target, source) {
       function copyProperty(key) {
         target[key] = source[key];
@@ -58,17 +113,8 @@ any = (function () {
       }
     }
 
-    function format(s, context) {
-      var l = s.split(/\{(.+?)\}/);
-      for (var i = 1; i < l.length; i += 2) {
-        l[i] = context[l[i]];
-      }
-      return l.join('');
-    }
-
     return {
-      mixin: mixin,
-      format: format
+      mixin: mixin
     };
   })();
 
@@ -240,128 +286,73 @@ any = (function () {
     /**
      * Control
      * @param className
-     * @param tagName
      * @constructor
      */
-    function Control(className, tagName) {
+    function Control(className) {
       var self = this, element;
-      self.className = className;
-      element = document.createElement(tagName || 'div');
-      element.classList.add('control');
-      element.classList.add(className);
+      element = document.createElement('div');
+      element.className = className;
       self.element = element;
-      self.children = [];
-      self.html = null;
+      self.items = [];
     }
 
     utils.mixin(Control.prototype, events.EventTarget.prototype);
-    Control.prototype.append = function (child) {
+    Control.prototype.append = function (item) {
       var self = this;
-      self.children.push(child);
+      self.items.push(item);
     };
     Control.prototype.empty = function () {
       var self = this, element = self.element;
       while (element.hasChildNodes()) {
         element.removeChild(element.firstChild);
       }
+      self.items = [];
     };
     Control.prototype.draw = function () {
-      var self = this, child, children = self.children, element = self.element;
-      self.empty();
-      if (self.html) {
-        element.innerHTML = self.html;
-      }
-      for (var i = 0, l = children.length; i < l; i++) {
-        child = children[i];
-        if (element.classList.contains('horizontal')) {
-          child.element.style.width = (100 / l) + '%';
+      var self = this, item, items = self.items, element = self.element;
+      //self.empty();
+      for (var i = 0, l = items.length; i < l; i++) {
+        item = items[i];
+        if (element.className.indexOf('horizontal') > -1) {
+          item.element.style.width = (100 / l) + '%';
         }
-        child.draw();
-        element.appendChild(child.element);
+        element.appendChild(item.element);
+        item.draw();
       }
-    };
-    Control.prototype.show = function (duration, complete) {
-      var self = this, element = self.element, classList = element.classList;
-      if (duration) {
-        element.style[animation.transition] = 'opacity 1s';
-        if (complete) {
-          element.addEventListener(animation.transitionEnd, function () {
-            element.removeEventListener(animation.transitionEnd);
-            element.style[animation.transition] = '';
-            complete();
-          });
-        }
-      }
-      if (classList.contains('hidden')) {
-        classList.remove('hidden');
-      }
-    };
-    Control.prototype.hide = function (duration, complete) {
-      var self = this, element = self.element, classList = element.classList;
-      if (duration) {
-        element.style[animation.transition] = 'opacity 1s';
-        if (complete) {
-          element.addEventListener(animation.transitionEnd, function () {
-            element.removeEventListener(animation.transitionEnd);
-            element.style[animation.transition] = '';
-            complete();
-          });
-        }
-      }
-      if (!classList.contains('hidden')) {
-        classList.add('hidden');
-      }
-    };
-    Control.prototype.moveTo = function (x, y, duration, complete) {
-      var self = this, element = self.element;
-      if (duration) {
-        if (complete) {
-          element.addEventListener(animation.transitionEnd, function () {
-            element.removeEventListener(animation.transitionEnd);
-            complete();
-          });
-        }
-      }
-      element.style.left = x + 'px';
-      element.style.top = y + 'px';
     };
     Control.prototype.addClass = function (className) {
-      var self = this, element = self.element, classList;
-      classList = className.split(' ');
-      for (var i = 0, l = classList.length; i < l; i++) {
-        if (!element.classList.contains(classList[i])) {
-          element.classList.add(classList[i]);
-        }
-      }
+      this.element.className += ' ' + className;
     };
 
     /**
      * Item
-     * @param html
-     * @param className
-     * @param tagName
      * @constructor
      */
-    function Item(html, className, tagName) {
+    function Item(element) {
       var self = this;
-      Control.call(self, className || CLASS_NAME.ITEM, tagName);
-      self.html = html;
+      self.element = element;
+      self.items = [];
     }
 
     Item.prototype = new Control();
 
     /**
      * ListViewItem
-     * @param html
      * @param className
      * @constructor
      */
-    function ListViewItem(html, className) {
-      var self = this;
-      Item.call(self, html, className || CLASS_NAME.LIST_VIEW_ITEM, 'li');
+    function ListViewItem(className) {
+      var self = this, element;
+      element = document.createElement('li');
+      element.className = className;
+      self.element = element;
     }
 
     ListViewItem.prototype = new Item();
+    ListViewItem.prototype.draw = function (child) {
+      var self = this;
+      self.element.appendChild(child);
+    };
 
     /**
      * ListView
@@ -371,8 +362,11 @@ any = (function () {
      * @constructor
      */
     function ListView(list, itemTemplate, className) {
-      var self = this;
-      Control.call(self, className || CLASS_NAME.LIST_VIEW, 'ul');
+      var self = this, element;
+      self.className = className || CLASS_NAME.LIST_VIEW;
+      element = document.createElement('ul');
+      element.className = self.className;
+      self.element = element;
       if (list) {
         list.addEventListener('ItemAdded', function (e) {
           self.onItemAdded(e);
@@ -385,19 +379,25 @@ any = (function () {
         });
         self.itemTemplate = itemTemplate;
         self.list = list;
-        for (var i = 0, l = list.length; i < l; i++) {
-          self.append(new ListViewItem(utils.format(itemTemplate, list[i]), self.className + '-item'));
-        }
       }
     }
 
     ListView.prototype = new Control();
+    ListView.prototype.draw = function () {
+      var self = this, list = self.list, item, element = self.element,
+        itemTemplate = self.itemTemplate;
+      //self.empty();
+      for (var i = 0, l = list.length; i < l; i++) {
+        item = new ListViewItem(self.className + '-item');
+        item.draw(itemTemplate(list[i]));
+        element.appendChild(item.element);
+      }
+    };
     ListView.prototype.onItemAdded = function (e) {
       var self = this, args, item;
       args = e.args;
-      item = new ListViewItem(utils.format(self.itemTemplate, args.item), self.className + '-item');
-      item.draw();
-      self.children.push(item);
+      item = new ListViewItem(self.className + '-item');
+      item.draw(self.itemTemplate(args.item));
       self.element.appendChild(item.element);
     };
     ListView.prototype.onItemRemoved = function (e) {
@@ -406,7 +406,6 @@ any = (function () {
       index = args.index;
       if (!isNaN(index)) {
         child = document.querySelector('.' + self.className + '-item:nth-child(' + (index + 1) + ')');
-        self.children.splice(index, 1);
         self.element.removeChild(child);
       }
     };
@@ -416,9 +415,8 @@ any = (function () {
       index = args.index;
       if (!isNaN(index)) {
         child = document.querySelector('.' + self.className + '-item:nth-child(' + (index + 1) + ')');
-        item = new ListViewItem(utils.format(self.itemTemplate, args.item), self.className + '-item');
-        item.draw();
-        self.children[index] = item;
+        item = new ListViewItem(self.className + '-item');
+        item.draw(self.itemTemplate(args.item));
         self.element.replaceChild(item.element, child);
       }
     };
@@ -432,7 +430,7 @@ any = (function () {
       var self = this;
       Control.call(self, CLASS_NAME.BOX);
       if (child) {
-        self.children.push(child);
+        self.items.push(child);
       }
     }
 
@@ -483,58 +481,3 @@ any = (function () {
     controls: controls
   };
 })(any);
-
-/**
- * Created by mspark on 16. 6. 25.
- */
-/*jshint browser:true */
-/*globals any:false */
-'use strict';
-
-if (typeof any === 'undefined') {
-  throw new Error('any.ui\'s JavaScript requires any');
-}
-
-var UI_CLASS_NAME = {
-  MENU: 'menu',
-  MENU_ITEM: 'menu-item'
-};
-
-any.ui = (function () {
-  var controls, ListView, Layer;
-  controls = any.controls;
-  ListView = controls.ListView;
-  Layer = controls.Layer;
-
-  function Menu(list, itemTemplate) {
-    var self = this;
-    ListView.call(self, list, itemTemplate, UI_CLASS_NAME.MENU);
-  }
-
-  Menu.prototype = new ListView();
-
-  function ContextMenu() {
-
-  }
-
-  ContextMenu.prototype = new Menu();
-
-  function Dialog() {
-
-  }
-
-  Dialog.prototype = new Layer();
-
-  function Pagination() {
-
-  }
-
-  Pagination.prototype = new ListView();
-
-  return {
-    ContextMenu: ContextMenu,
-    Dialog: Dialog,
-    Menu: Menu,
-    Pagination: Pagination
-  };
-}());
