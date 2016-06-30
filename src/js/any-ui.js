@@ -11,7 +11,9 @@ if (typeof any === 'undefined') {
 
 var UI_CLASS_NAME = {
   MENU: 'menu',
-  MENU_ITEM: 'menu-item'
+  MENU_ITEM: 'menu-item',
+  CONTEXT_MENU: 'context-menu',
+  CONTEXT_MENU_ITEM: 'context-menu-item'
 };
 
 any.ui = (function () {
