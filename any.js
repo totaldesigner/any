@@ -247,7 +247,6 @@ any = (function () {
             var self = this, element;
             self.className = className;
             element = document.createElement(tagName || 'div');
-            element.classList.add('control');
             element.classList.add(className);
             self.element = element;
             self.children = [];
@@ -485,20 +484,23 @@ any = (function () {
             if (children.length > 0) {
                 topLayer = children.splice(children.length - 1, 1);
                 self.element.removeChild(topLayer.element);
+                return true;
             }
+            return false;
         };
         Page.prototype.onKeyDown = function (e) {
             var self = this, keyCode = e.keyCode || e.which;
             if (keyCode === 8 /* BACKSPACE */) {
-                self.removeTopLayer();
-                if (e.stopPropagation) {
-                    e.stopPropagation();
-                }
-                if (!e.cancelBubble) {
-                    e.cancelBubble = true;
-                }
-                if (e.preventDefault) {
-                    e.preventDefault();
+                if (self.removeTopLayer()) {
+                    if (e.stopPropagation) {
+                        e.stopPropagation();
+                    }
+                    if (!e.cancelBubble) {
+                        e.cancelBubble = true;
+                    }
+                    if (e.preventDefault) {
+                        e.preventDefault();
+                    }
                 }
             }
         };
