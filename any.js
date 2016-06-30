@@ -469,10 +469,14 @@ any = (function () {
             children = self.element.querySelectorAll('.' + self.className + '-item');
             for (var i = 0, l = children.length; i < l; i++) {
                 child = children[i];
-                child.addEventListener('click', function(e) {
-                    self.dispatchEvent('MenuItemSelected', new events.MenuItemSelected(self, e));
-                });
+                self.onMenuItemSelected(child);
             }
+        };
+        Menu.prototype.onMenuItemSelected = function(child) {
+            var self = this;
+            child.addEventListener('click', function(e) {
+                self.dispatchEvent('MenuItemSelected', new events.MenuItemSelected(self, e));
+            });
         };
 
         /**
