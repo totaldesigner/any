@@ -464,10 +464,17 @@ any = (function () {
 
         Menu.prototype = new ListView();
         Menu.prototype.draw = function() {
-            var self = this, children;
+            var self = this, child, children;
             ListView.prototype.draw.call(self);
             children = self.element.querySelectorAll('.' + self.className + '-item');
-            children.addEventListener('click', function(e) {
+            for (var i = 0, l = children.length; i < l; i++) {
+                child = children[i];
+                self.onMenuItemSelected(child);
+            }
+        };
+        Menu.prototype.onMenuItemSelected = function(child) {
+            var self = this;
+            child.addEventListener('click', function(e) {
                 self.dispatchEvent('MenuItemSelected', new events.MenuItemSelected(self, e));
             });
         };
