@@ -8,8 +8,12 @@ var CLASS_NAME = {
     BOX: 'box',
     VIEW: 'view',
     ITEM: 'item',
-    LIST_VIEW: 'list-view',
     LIST_VIEW_ITEM: 'list-view-item',
+    LIST_VIEW: 'list-view',
+    MENU_ITEM: 'menu-item',
+    MENU: 'menu',
+    CONTEXT_MENU_ITEM: 'context-menu-item',
+    CONTEXT_MENU: 'context-menu',
     LAYOUT: 'layout',
     LAYER: 'layer',
     PAGE: 'page'
@@ -436,6 +440,39 @@ any = (function () {
         };
 
         /**
+         * Menu
+         * @param list
+         * @param itemTemplate
+         * @constructor
+         */
+        function Menu(list, itemTemplate) {
+            var self = this;
+            ListView.call(self, list, itemTemplate, CLASS_NAME.MENU);
+        }
+
+        Menu.prototype = new ListView();
+
+        /**
+         * ContextMenu
+         * @constructor
+         */
+        function ContextMenu() {
+
+        }
+
+        ContextMenu.prototype = new Menu();
+
+        /**
+         * Pagination
+         * @constructor
+         */
+        function Pagination() {
+
+        }
+
+        Pagination.prototype = new ListView();
+
+        /**
          * Box
          * @param child
          * @constructor
@@ -460,6 +497,16 @@ any = (function () {
         }
 
         Layer.prototype = new Control();
+
+        /**
+         * Dialog
+         * @constructor
+         */
+        function Dialog() {
+
+        }
+
+        Dialog.prototype = new Layer();
 
         /**
          * Page
@@ -509,7 +556,11 @@ any = (function () {
             Item: Item,
             Box: Box,
             ListView: ListView,
+            Menu: Menu,
+            ContextMenu: ContextMenu,
+            Pagination: Pagination,
             Layer: Layer,
+            Dialog: Dialog,
             Page: Page
         };
     })();

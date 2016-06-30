@@ -16,7 +16,7 @@ if (typeof any === 'undefined') {
 
     Page = any.controls.Page;
     Layer = any.controls.Layer;
-    Menu = any.ui.Menu;
+    Menu = any.controls.Menu;
     List = any.collections.List;
     Box = any.controls.Box;
     Item = any.controls.Item;

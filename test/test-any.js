@@ -5,7 +5,7 @@ ListView = any.controls.ListView;
 Layout = any.controls.Layout;
 Layer = any.controls.Layer;
 Page = any.controls.Page;
-Menu = any.ui.Menu;
+Menu = any.controls.Menu;
 
 describe('any.js', function () {
     it('should return the item\'s name of List', function () {
