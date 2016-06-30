@@ -247,7 +247,6 @@ any = (function () {
             var self = this, element;
             self.className = className;
             element = document.createElement(tagName || 'div');
-            element.classList.add('control');
             element.classList.add(className);
             self.element = element;
             self.children = [];
