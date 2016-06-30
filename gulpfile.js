@@ -109,7 +109,10 @@ gulp.task('release', function () {
         .pipe(shell([
             'git tag -d v' + version,
             'git push origin :refs/tags/v' + version]))
-        .pipe(tagVersion({version: version}));
+        .pipe(tagVersion({version: version}))
+        .pipe(shell([
+            'git push origin master --tags'
+            ]));
 });
 
 gulp.task('clean', function (cb) {
