@@ -128,6 +128,18 @@ any = (function () {
         ItemUpdated.prototype = new Event();
 
         /**
+         * MenuItemSelected
+         * @param sender
+         * @param args
+         * @constructor
+         */
+        function MenuItemSelected(sender, args) {
+            Event.call(this, 'MenuItemSelected', sender, args);
+        }
+
+        MenuItemSelected.prototype = new Event();
+
+        /**
          * EventTarget
          * @constructor
          */
@@ -402,6 +414,14 @@ any = (function () {
         }
 
         ListView.prototype = new Control();
+        ListView.prototype.draw = function() {
+            var self = this, children;
+            Control.prototype.draw.call(self);
+            children = self.element.querySelectorAll('.' + self.className + '-item');
+            children.addEventListener('click', function(e) {
+                self.dispatchEvent('MenuItemSelected', new events.MenuItemSelected(self, e));
+            });
+        };
         ListView.prototype.onItemAdded = function (e) {
             var self = this, args, item;
             args = e.args;
