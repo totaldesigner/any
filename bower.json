@@ -1,24 +1,24 @@
 {
-  "name": "anyjs",
-  "version": "0.0.1",
-  "main": [
-    "any.js",
-    "any.css"
-  ],
-  "ignore": [
-    "examples",
-    "src",
-    "test",
-    ".bowerrc",
-    ".editorconfig",
-    ".gitignore",
-    ".jshintrc",
-    "bower.json",
-    "gulpfile.js",
-    "package.json",
-    "README.md"
-  ],
-  "dependencies": {
-    "normalize.css": "~4.1.1"
-  }
+    "name": "anyjs",
+    "version": "0.0.1",
+    "main": [
+        "any.js",
+        "any.css"
+    ],
+    "ignore": [
+        "examples",
+        "src",
+        "test",
+        ".bowerrc",
+        ".editorconfig",
+        ".gitignore",
+        ".jshintrc",
+        "bower.json",
+        "gulpfile.js",
+        "package.json",
+        "README.md"
+    ],
+    "dependencies": {
+        "normalize.css": "~4.1.1"
+    }
 }

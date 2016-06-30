@@ -8,66 +8,66 @@ Page = any.controls.Page;
 Menu = any.ui.Menu;
 
 describe('any.js', function () {
-  it('should return the item\'s name of List', function () {
-    var List, list;
-    List = any.collections.List;
-    list = new List([{name: 'MS'}]);
-    list.should.equal(list);
-  });
-  it('should display the ListView without error', function () {
-    var div, listView, layer, page;
-
-    // List
-    list = new List([{name: 'mspark1'}, {name: 'mspark2'}, {name: 'mspark3'}]);
-
-    // ListView
-    listView = new ListView(list, '<div>{name}</div>');
-
-    // Layer
-    layer = new Layer();
-    layer.append(listView);
-
-    // Page
-    page = new Page();
-    page.append(layer);
-    page.draw();
-
-    list.add({
-      name: 'mspark4'
+    it('should return the item\'s name of List', function () {
+        var List, list;
+        List = any.collections.List;
+        list = new List([{name: 'MS'}]);
+        list.should.equal(list);
     });
+    it('should display the ListView without error', function () {
+        var div, listView, layer, page;
 
-    list.removeAt(2);
+        // List
+        list = new List([{name: 'mspark1'}, {name: 'mspark2'}, {name: 'mspark3'}]);
 
-    list.update(0, {
-      name: 'mspark7'
+        // ListView
+        listView = new ListView(list, '<div>{name}</div>');
+
+        // Layer
+        layer = new Layer();
+        layer.append(listView);
+
+        // Page
+        page = new Page();
+        page.append(layer);
+        page.draw();
+
+        list.add({
+            name: 'mspark4'
+        });
+
+        list.removeAt(2);
+
+        list.update(0, {
+            name: 'mspark7'
+        });
     });
-  });
-  it('should display the Menu without error', function () {
-    var a, list, menu, layer, page;
+    it('should display the Menu without error', function () {
+        var a, list, menu, layer, page;
 
-    // List
-    list = new List([{name: '메인'}, {name: '잡화'}, {name: '도구'}, {name: '외출'}, {name: '음식'}, {name: '문의'}]);
+        // List
+        list = new List([{name: '메인'}, {name: '잡화'}, {name: '도구'}, {name: '외출'}, {name: '음식'}, {name: '문의'}]);
 
-    // Menu
-    menu = new Menu(list, '<a>{name}</a>');
+        // Menu
+        menu = new Menu(list, '<a>{name}</a>');
 
-    // Layer
-    layer = new Layer();
-    layer.append(menu);
+        // Layer
+        layer = new Layer();
+        layer.append(menu);
 
-    // Page
-    page = new Page();
-    page.append(layer);
-    page.draw();
+        // Page
+        page = new Page();
+        page.append(layer);
+        page.draw();
 
-    list.add({
-      name: '위치'
+        list.add({
+            name: '위치'
+        });
+
+        list.removeAt(2);
+
+        list.update(0, {
+            name: '홈'
+        });
     });
-
-    list.removeAt(2);
-
-    list.update(0, {
-      name: '홈'
-    });
-  });
 });

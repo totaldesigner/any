@@ -1,61 +1,60 @@
 @import (inline) "normalize.css/normalize.css";
 
 body {
-  margin: 0;
-  font-family: '맑은 고딕', 'Apple SD Gothic Neo', sans-serif;
+    margin: 0;
+    font-family: '맑은 고딕', 'Apple SD Gothic Neo', sans-serif;
 }
 
 .any {
-  .hidden {
-    display: none;
-    opacity: 0;
-  }
-  ul {
-    list-style: none;
-    margin: 0;
-    padding: 0;
-  }
-  .item {
-    float: left;
-  }
-  .box {
-  }
-  .layer {
-  }
-  .list-view {
-    .list-view-item {
-
+    .hidden {
+        display: none;
+        opacity: 0;
     }
-  }
+    ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+    .item {
+        float: left;
+    }
+    .box {
+    }
+    .layer {
+    }
+    .list-view {
+        .list-view-item {
+
+        }
+    }
 }
 
 /* ########## 599px 이하 ########## */
 @media (max-width: 599px) {
-  .layer {
-  }
+    .layer {
+    }
 }
-
 
 /* ########## 768px 이상 ########## */
 @media (min-width: 768px) {
-  .any {
-    .box {
-      &.horizontal {
-        &:after {
-          content: "";
-          display: block;
-          clear: both;
+    .any {
+        .box {
+            &.horizontal {
+                &:after {
+                    content: "";
+                    display: block;
+                    clear: both;
+                }
+                > .box {
+                    float: left;
+                }
+            }
         }
-        > .box {
-          float: left;
-        }
-      }
     }
-  }
 }
 
 /* ########## 1190px 이상 ########## */
 @media (min-width: 1190px) {
-  .layer {
-  }
+    .layer {
+    }
 }

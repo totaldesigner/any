@@ -6,51 +6,51 @@
 'use strict';
 
 if (typeof any === 'undefined') {
-  throw new Error('any.ui\'s JavaScript requires any');
+    throw new Error('any.ui\'s JavaScript requires any');
 }
 
 var UI_CLASS_NAME = {
-  MENU: 'menu',
-  MENU_ITEM: 'menu-item',
-  CONTEXT_MENU: 'context-menu',
-  CONTEXT_MENU_ITEM: 'context-menu-item'
+    MENU: 'menu',
+    MENU_ITEM: 'menu-item',
+    CONTEXT_MENU: 'context-menu',
+    CONTEXT_MENU_ITEM: 'context-menu-item'
 };
 
 any.ui = (function () {
-  var controls, ListView, Layer;
-  controls = any.controls;
-  ListView = controls.ListView;
-  Layer = controls.Layer;
+    var controls, ListView, Layer;
+    controls = any.controls;
+    ListView = controls.ListView;
+    Layer = controls.Layer;
 
-  function Menu(list, itemTemplate) {
-    var self = this;
-    ListView.call(self, list, itemTemplate, UI_CLASS_NAME.MENU);
-  }
+    function Menu(list, itemTemplate) {
+        var self = this;
+        ListView.call(self, list, itemTemplate, UI_CLASS_NAME.MENU);
+    }
 
-  Menu.prototype = new ListView();
+    Menu.prototype = new ListView();
 
-  function ContextMenu() {
+    function ContextMenu() {
 
-  }
+    }
 
-  ContextMenu.prototype = new Menu();
+    ContextMenu.prototype = new Menu();
 
-  function Dialog() {
+    function Dialog() {
 
-  }
+    }
 
-  Dialog.prototype = new Layer();
+    Dialog.prototype = new Layer();
 
-  function Pagination() {
+    function Pagination() {
 
-  }
+    }
 
-  Pagination.prototype = new ListView();
+    Pagination.prototype = new ListView();
 
-  return {
-    ContextMenu: ContextMenu,
-    Dialog: Dialog,
-    Menu: Menu,
-    Pagination: Pagination
-  };
+    return {
+        ContextMenu: ContextMenu,
+        Dialog: Dialog,
+        Menu: Menu,
+        Pagination: Pagination
+    };
 }());
