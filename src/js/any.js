@@ -283,7 +283,9 @@ any = (function () {
     Control.prototype.show = function (duration, complete) {
       var self = this, element = self.element, classList = element.classList;
       if (duration) {
-        element.style[animation.transition] = 'opacity 1s';
+        element.style[animation.transition] = utils.format('opacity {duration}ms', {
+          duration: duration
+        });
         if (complete) {
           element.addEventListener(animation.transitionEnd, function () {
             element.removeEventListener(animation.transitionEnd);
@@ -299,7 +301,9 @@ any = (function () {
     Control.prototype.hide = function (duration, complete) {
       var self = this, element = self.element, classList = element.classList;
       if (duration) {
-        element.style[animation.transition] = 'opacity 1s';
+        element.style[animation.transition] = utils.format('opacity {duration}ms', {
+          duration: duration
+        });
         if (complete) {
           element.addEventListener(animation.transitionEnd, function () {
             element.removeEventListener(animation.transitionEnd);
@@ -315,6 +319,9 @@ any = (function () {
     Control.prototype.moveTo = function (x, y, duration, complete) {
       var self = this, element = self.element;
       if (duration) {
+        element.style[animation.transition] = utils.format('top {duration}ms, left {duration}ms', {
+          duration: duration
+        });
         if (complete) {
           element.addEventListener(animation.transitionEnd, function () {
             element.removeEventListener(animation.transitionEnd);
