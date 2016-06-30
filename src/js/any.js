@@ -476,7 +476,7 @@ any = (function () {
         Menu.prototype.onMenuItemSelected = function(child) {
             var self = this;
             child.addEventListener('click', function(e) {
-                self.dispatchEvent('MenuItemSelected', new events.MenuItemSelected(self, e));
+                self.dispatchEvent(new events.MenuItemSelected(self, e));
             });
         };
 
