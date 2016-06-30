@@ -193,7 +193,8 @@ any = (function () {
             EventTarget: EventTarget,
             ItemAdded: ItemAdded,
             ItemRemoved: ItemRemoved,
-            ItemUpdated: ItemUpdated
+            ItemUpdated: ItemUpdated,
+            MenuItemSelected: MenuItemSelected
         };
     })();
 
