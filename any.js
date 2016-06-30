@@ -481,7 +481,7 @@ any = (function () {
     };
     Page.prototype.onKeyDown = function (e) {
       var self = this, keyCode = e.keyCode || e.which;
-      if (keyCode == 8 /* BACKSPACE */) {
+      if (keyCode === 8 /* BACKSPACE */) {
         self.removeTopLayer();
         if (e.stopPropagation) {
           e.stopPropagation();
