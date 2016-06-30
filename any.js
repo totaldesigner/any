@@ -447,7 +447,7 @@ any = (function () {
          */
         function Menu(list, itemTemplate) {
             var self = this;
-            ListView.call(self, list, itemTemplate, UI_CLASS_NAME.MENU);
+            ListView.call(self, list, itemTemplate, CLASS_NAME.MENU);
         }
 
         Menu.prototype = new ListView();
