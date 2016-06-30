@@ -21,11 +21,7 @@ describe('any.js', function () {
     list = new List([{name: 'mspark1'}, {name: 'mspark2'}, {name: 'mspark3'}]);
 
     // ListView
-    listView = new ListView(list, function (item) {
-      d = document.createElement('div');
-      d.appendChild(document.createTextNode(item.name));
-      return d;
-    });
+    listView = new ListView(list, '<div>{name}</div>');
 
     // Layer
     layer = new Layer();
@@ -53,11 +49,7 @@ describe('any.js', function () {
     list = new List([{name: '메인'}, {name: '잡화'}, {name: '도구'}, {name: '외출'}, {name: '음식'}, {name: '문의'}]);
 
     // Menu
-    menu = new Menu(list, function (item) {
-      a = document.createElement('a');
-      a.appendChild(document.createTextNode(item.name));
-      return a;
-    });
+    menu = new Menu(list, '<a>{name}</a>');
 
     // Layer
     layer = new Layer();
