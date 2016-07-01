@@ -487,7 +487,7 @@ any = (function () {
             child.addEventListener('click', function (e) {
                 var target, index;
                 target = e.target || e.srcElement;
-                index = self.getNodeIndex(target)
+                index = self.getNodeIndex(target);
                 self.dispatchEvent(new events.MenuItemSelected(self, {
                     index: index,
                     item: self.children[index]

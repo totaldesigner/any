@@ -14,6 +14,8 @@ var CLASS_NAME = {
     MENU: 'menu',
     CONTEXT_MENU_ITEM: 'context-menu-item',
     CONTEXT_MENU: 'context-menu',
+    CAROUSEL_ITEM: 'carousel-item',
+    CAROUSEL: 'carousel',
     LAYOUT: 'layout',
     LAYER: 'layer',
     PAGE: 'page'
@@ -316,7 +318,7 @@ any = (function () {
                 }
             } else {
                 for (var style in css) {
-                    if(css.hasOwnProperty(style)) {
+                    if (css.hasOwnProperty(style)) {
                         element.style[style] = css[style];
                     }
                 }
@@ -522,6 +524,28 @@ any = (function () {
         }
 
         Pagination.prototype = new ListView();
+
+		/**
+         * Carousel
+         * @param list
+         * @param itemTemplate
+         * @constructor
+         */
+        function Carousel(list, itemTemplate) {
+            var self = this;
+            ListView.call(self, list, itemTemplate, CLASS_NAME.CAROUSEL);
+        }
+
+        Carousel.prototype = new ListView();
+        Carousel.prototype.draw = function () {
+            var self = this;
+        };
+        Carousel.prototype.previous = function () {
+            var self = this;
+        };
+        Carousel.prototype.next = function () {
+            var self = this;
+        };
 
         /**
          * Box
