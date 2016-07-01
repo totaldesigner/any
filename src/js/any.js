@@ -296,57 +296,65 @@ any = (function () {
                 element.appendChild(child.element);
             }
         };
-        Control.prototype.show = function (duration, complete) {
+        Control.prototype.transit = function (css, transition, complete) {
             var self = this, element = self.element, classList = element.classList;
-            if (duration) {
-                element.style[animation.transition] = utils.format('opacity {duration}ms', {
-                    duration: duration
+            if (transition) {
+                element.style[animation.transition] = transition;
+            }
+            if (complete) {
+                element.addEventListener(animation.transitionEnd, function () {
+                    element.removeEventListener(animation.transitionEnd);
+                    element.style[animation.transition] = '';
+                    complete();
                 });
-                if (complete) {
-                    element.addEventListener(animation.transitionEnd, function () {
-                        element.removeEventListener(animation.transitionEnd);
-                        element.style[animation.transition] = '';
-                        complete();
-                    });
+            }
+            if (css instanceof String) {
+                if (classList.contains(css)) {
+                    classList.remove(css);
+                } else {
+                    classList.add(css);
+                }
+            } else {
+                for (var style in css) {
+                    if(css.hasOwnProperty(style)) {
+                        element.style[style] = css[style];
+                    }
                 }
             }
-            if (classList.contains('hidden')) {
-                classList.remove('hidden');
+        };
+        Control.prototype.show = function (duration, complete) {
+            var self = this, css = 'hidden', transition, element = self.element, classList = element.classList;
+            if (classList.contains(css)) {
+                if (duration) {
+                    transition = utils.format('opacity {duration}ms', {
+                        duration: duration
+                    });
+                }
+                self.transit(css, transition, complete);
             }
         };
         Control.prototype.hide = function (duration, complete) {
-            var self = this, element = self.element, classList = element.classList;
-            if (duration) {
-                element.style[animation.transition] = utils.format('opacity {duration}ms', {
-                    duration: duration
-                });
-                if (complete) {
-                    element.addEventListener(animation.transitionEnd, function () {
-                        element.removeEventListener(animation.transitionEnd);
-                        element.style[animation.transition] = '';
-                        complete();
+            var self = this, css = 'hidden', transition, element = self.element, classList = element.classList;
+            if (!classList.contains(css)) {
+                if (duration) {
+                    transition = utils.format('opacity {duration}ms', {
+                        duration: duration
                     });
                 }
-            }
-            if (!classList.contains('hidden')) {
-                classList.add('hidden');
+                self.transit(css, transition, complete);
             }
         };
         Control.prototype.moveTo = function (x, y, duration, complete) {
-            var self = this, element = self.element;
+            var self = this, transition;
             if (duration) {
-                element.style[animation.transition] = utils.format('top {duration}ms, left {duration}ms', {
+                transition = utils.format('top {duration}ms, left {duration}ms', {
                     duration: duration
                 });
-                if (complete) {
-                    element.addEventListener(animation.transitionEnd, function () {
-                        element.removeEventListener(animation.transitionEnd);
-                        complete();
-                    });
-                }
             }
-            element.style.left = x + 'px';
-            element.style.top = y + 'px';
+            self.transit({
+                left: x + 'px',
+                top: y + 'px'
+            }, transition, complete);
         };
         Control.prototype.addClass = function (className) {
             var self = this, element = self.element, classList;
