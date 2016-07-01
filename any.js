@@ -415,6 +415,15 @@ any = (function () {
         }
 
         ListView.prototype = new Control();
+        ListView.prototype.getNodeIndex = function (node) {
+            var index = 0;
+            while ((node = node.previousSibling)) {
+                if (node.nodeType !== 3 || !/^\s*$/.test(node.data)) {
+                    index++;
+                }
+            }
+            return index;
+        };
         ListView.prototype.onItemAdded = function (e) {
             var self = this, args, item;
             args = e.args;
@@ -464,7 +473,7 @@ any = (function () {
         }
 
         Menu.prototype = new ListView();
-        Menu.prototype.draw = function() {
+        Menu.prototype.draw = function () {
             var self = this, child, children;
             ListView.prototype.draw.call(self);
             children = self.element.querySelectorAll('.' + self.className + '-item');
@@ -473,10 +482,16 @@ any = (function () {
                 self.onMenuItemSelected(child);
             }
         };
-        Menu.prototype.onMenuItemSelected = function(child) {
+        Menu.prototype.onMenuItemSelected = function (child) {
             var self = this;
-            child.addEventListener('click', function(e) {
-                self.dispatchEvent(new events.MenuItemSelected(self, e));
+            child.addEventListener('click', function (e) {
+                var target, index;
+                target = e.target || e.srcElement;
+                index = self.getNodeIndex(target)
+                self.dispatchEvent(new events.MenuItemSelected(self, {
+                    index: index,
+                    item: self.children[index]
+                }));
             });
         };
 
