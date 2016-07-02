@@ -4,7 +4,7 @@
 /*jshint browser:true */
 'use strict';
 
-var CLASS_NAME = {
+const CLASS_NAME = {
     BOX: 'box',
     VIEW: 'view',
     ITEM: 'item',
@@ -14,10 +14,17 @@ var CLASS_NAME = {
     MENU: 'menu',
     CONTEXT_MENU_ITEM: 'context-menu-item',
     CONTEXT_MENU: 'context-menu',
+    CAROUSEL_ITEM: 'carousel-item',
+    CAROUSEL: 'carousel',
     LAYOUT: 'layout',
     LAYER: 'layer',
     PAGE: 'page'
 };
+const DIRECTION = {
+    LEFT: 'left',
+    RIGHT: 'right'
+};
+const ANIMATION_DURATION = 1000;
 
 var any = any || {};
 any = (function () {
@@ -37,7 +44,7 @@ any = (function () {
             };
             for (transition in transitions) {
                 if (transitions.hasOwnProperty(transition)) {
-                    if (element.style[transition]) {
+                    if (element.style.hasOwnProperty(transition)) {
                         return {
                             transition: transition,
                             transitionEnd: transitions[transition]
@@ -128,6 +135,18 @@ any = (function () {
         ItemUpdated.prototype = new Event();
 
         /**
+         * ItemLoaded
+         * @param sender
+         * @param args
+         * @constructor
+         */
+        function ItemLoaded(sender, args) {
+            Event.call(this, 'ItemLoaded', sender, args);
+        }
+
+        ItemLoaded.prototype = new Event();
+
+        /**
          * MenuItemSelected
          * @param sender
          * @param args
@@ -194,6 +213,7 @@ any = (function () {
             ItemAdded: ItemAdded,
             ItemRemoved: ItemRemoved,
             ItemUpdated: ItemUpdated,
+            ItemLoaded: ItemLoaded,
             MenuItemSelected: MenuItemSelected
         };
     })();
@@ -296,57 +316,78 @@ any = (function () {
                 element.appendChild(child.element);
             }
         };
-        Control.prototype.show = function (duration, complete) {
+        Control.prototype.transit = function (css, transition, complete) {
             var self = this, element = self.element, classList = element.classList;
-            if (duration) {
-                element.style[animation.transition] = utils.format('opacity {duration}ms', {
-                    duration: duration
-                });
-                if (complete) {
-                    element.addEventListener(animation.transitionEnd, function () {
-                        element.removeEventListener(animation.transitionEnd);
-                        element.style[animation.transition] = '';
-                        complete();
-                    });
+            var transitions = ['-webkit-transition', '-moz-transition', '-o-transition', 'transition'];
+            if (transition) {
+                for (var i = 0; i < transitions.length; i++) {
+                    element.style[transitions[i]] = transition;
                 }
             }
-            if (classList.contains('hidden')) {
-                classList.remove('hidden');
+            if (complete) {
+                element.addEventListener(animation.transitionEnd, function () {
+                    element.removeEventListener(animation.transitionEnd);
+                    element.style[animation.transition] = '';
+                    complete();
+                });
+            }
+            setTimeout(function() {
+                if (css instanceof String) {
+                    if (classList.contains(css)) {
+                        classList.remove(css);
+                    } else {
+                        classList.add(css);
+                    }
+                } else {
+                    for (var key in css) {
+                        if (css.hasOwnProperty(key)) {
+                            element.style[key] = css[key];
+                        }
+                    }
+                }
+            }, 0);
+        };
+        Control.prototype.show = function (duration, complete) {
+            var self = this, css = 'hidden', transition, element = self.element, classList = element.classList;
+            if (classList.contains(css)) {
+                if (duration) {
+                    transition = utils.format('opacity {duration}ms', {
+                        duration: duration
+                    });
+                }
+                self.transit(css, transition, complete);
             }
         };
         Control.prototype.hide = function (duration, complete) {
-            var self = this, element = self.element, classList = element.classList;
-            if (duration) {
-                element.style[animation.transition] = utils.format('opacity {duration}ms', {
-                    duration: duration
-                });
-                if (complete) {
-                    element.addEventListener(animation.transitionEnd, function () {
-                        element.removeEventListener(animation.transitionEnd);
-                        element.style[animation.transition] = '';
-                        complete();
+            var self = this, css = 'hidden', transition, element = self.element, classList = element.classList;
+            if (!classList.contains(css)) {
+                if (duration) {
+                    transition = utils.format('opacity {duration}ms ease', {
+                        duration: duration
                     });
                 }
-            }
-            if (!classList.contains('hidden')) {
-                classList.add('hidden');
+                self.transit(css, transition, complete);
             }
         };
         Control.prototype.moveTo = function (x, y, duration, complete) {
-            var self = this, element = self.element;
+            var self = this, transition, style;
             if (duration) {
-                element.style[animation.transition] = utils.format('top {duration}ms, left {duration}ms', {
+                transition = utils.format('all {duration}ms ease', {
                     duration: duration
                 });
-                if (complete) {
-                    element.addEventListener(animation.transitionEnd, function () {
-                        element.removeEventListener(animation.transitionEnd);
-                        complete();
-                    });
-                }
             }
-            element.style.left = x + 'px';
-            element.style.top = y + 'px';
+            style = utils.format('translate3d({x}px, {y}px, {z}px)', {
+                x: x,
+                y: y,
+                z: 0
+            });
+            self.transit({
+                '-webkit-transform': style,
+                '-moz-transform': style,
+                '-o-transform': style,
+                '-ms-transform': style,
+                'transform': style
+            }, transition, complete);
         };
         Control.prototype.addClass = function (className) {
             var self = this, element = self.element, classList;
@@ -369,6 +410,9 @@ any = (function () {
             var self = this;
             Control.call(self, className || CLASS_NAME.ITEM, tagName);
             self.html = html;
+            self.element.addEventListener('load', function () {
+                self.dispatchEvent(new events.ItemLoaded(self, {}));
+            });
         }
 
         Item.prototype = new Control();
@@ -516,6 +560,69 @@ any = (function () {
         Pagination.prototype = new ListView();
 
         /**
+         * Carousel
+         * @param list
+         * @param itemTemplate
+         * @param options
+         * @constructor
+         */
+        function Carousel(list, itemTemplate, options) {
+            var self = this;
+            options = options || {};
+            options.visibleCount = options.visibleCount || 3;
+            self.options = options;
+            ListView.call(self, list, itemTemplate, CLASS_NAME.CAROUSEL);
+            self.wrapper = new controls.Box();
+            self.wrapper.addClass('carousel-wrapper');
+        }
+
+        Carousel.prototype = new ListView();
+        Carousel.prototype.draw = function () {
+            var self = this, wrapper = self.wrapper, child, children, visibleCount, childWidth;
+            children = self.children;
+            visibleCount = self.options.visibleCount;
+            childWidth = 100 / visibleCount;
+            for (var i = 0; i < visibleCount; i++) {
+                child = children[i];
+                child.draw();
+                child.element.style.width = childWidth + '%';
+                wrapper.element.appendChild(child.element);
+            }
+            self.element.appendChild(wrapper.element);
+            self.next();
+        };
+        Carousel.prototype.slide = function (direction) {
+            var self = this, itemWidth, left, firstChild, children, element;
+            children = self.children;
+            firstChild = children[0];
+            // Workaround: Daddy will fix it.
+            setTimeout(function () {
+                //firstChild.addEventListener('ItemLoaded', function () {
+                element = firstChild.element;
+                itemWidth = element.clientWidth;
+                left = element.offsetLeft;
+                if (direction === DIRECTION.LEFT) {
+                    itemWidth = -itemWidth;
+                }
+                function move() {
+                    self.wrapper.moveTo(left += itemWidth, 0, ANIMATION_DURATION);
+                }
+
+                setInterval(function () {
+                    move();
+                }, 5000);
+                //});
+            }, 1000);
+        };
+        Carousel.prototype.prev = function () {
+            this.slide(DIRECTION.RIGHT);
+        };
+        Carousel.prototype.next = function () {
+            this.slide(DIRECTION.LEFT);
+        };
+
+
+        /**
          * Box
          * @param child
          * @constructor
@@ -600,6 +707,7 @@ any = (function () {
             Box: Box,
             ListView: ListView,
             Menu: Menu,
+            Carousel: Carousel,
             ContextMenu: ContextMenu,
             Pagination: Pagination,
             Layer: Layer,

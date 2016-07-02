@@ -422,6 +422,23 @@ body {
   margin: 0;
   font-family: '맑은 고딕', 'Apple SD Gothic Neo', sans-serif;
 }
+.any ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.any ul li {
+  list-style: none;
+}
+.any a {
+  display: block;
+  font-size: 14px;
+  text-decoration: none;
+  cursor: pointer;
+}
+.any a:hover {
+  background-color: #eeeeee;
+}
 .any .hidden {
   display: none;
   opacity: 0;
@@ -438,16 +455,6 @@ body {
   float: left;
   width: auto;
 }
-.any .menu > .menu-item a {
-  display: block;
-  padding: 5px;
-  font-size: 14px;
-  text-decoration: none;
-  cursor: pointer;
-}
-.any .menu > .menu-item a:hover {
-  background-color: #eeeeee;
-}
 .any .menu:after {
   content: "";
   display: block;
@@ -455,6 +462,28 @@ body {
 }
 .any .context-menu {
   position: absolute;
+}
+.any .carousel {
+  overflow: hidden;
+  position: relative;
+}
+.any .carousel .carousel-wrapper {
+  position: relative;
+  display: block;
+}
+.any .carousel .carousel-wrapper .carousel-item {
+  float: left;
+  width: auto;
+  background-color: #eeeeee;
+}
+.any .carousel .carousel-wrapper .carousel-item > div {
+  padding: 10px;
+  border: solid 1px #cccccc;
+}
+.any .carousel .carousel-wrapper:after {
+  content: "";
+  display: block;
+  clear: both;
 }
 .any .dialog {
   display: none;

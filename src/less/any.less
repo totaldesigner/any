@@ -6,6 +6,23 @@ body {
 }
 
 .any {
+    ul {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        li {
+            list-style: none;
+        }
+    }
+    a {
+        display: block;
+        font-size: 14px;
+        text-decoration: none;
+        cursor: pointer;
+        &:hover {
+            background-color: #eeeeee;
+        }
+    }
     .hidden {
         display: none;
         opacity: 0;
@@ -27,16 +44,6 @@ body {
         > .menu-item {
             float: left;
             width: auto;
-            a {
-                display: block;
-                padding: 5px;
-                font-size: 14px;
-                text-decoration: none;
-                cursor: pointer;
-                &:hover {
-                    background-color: #eeeeee;
-                }
-            }
         }
         &:after {
             content: "";
@@ -51,9 +58,21 @@ body {
         }
     }
     .carousel {
+        overflow: hidden;
         position: relative;
-        .carousel-item {
-            position: absolute;
+        .carousel-wrapper {
+            position: relative;
+            display: block;
+            .carousel-item {
+                float: left;
+                width: auto;
+                background-color: #eeeeee;
+            }
+            &:after {
+                content: "";
+                display: block;
+                clear: both;
+            }
         }
     }
     .layer {
