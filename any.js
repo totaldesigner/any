@@ -331,7 +331,7 @@ any = (function () {
                     complete();
                 });
             }
-            setTimeout(function() {
+            setTimeout(function () {
                 if (css instanceof String) {
                     if (classList.contains(css)) {
                         classList.remove(css);
@@ -567,10 +567,14 @@ any = (function () {
          * @constructor
          */
         function Carousel(list, itemTemplate, options) {
-            var self = this;
-            options = options || {};
-            options.visibleCount = options.visibleCount || 3;
-            self.options = options;
+            var self = this, settings;
+            settings = {
+                slides: 1,
+                speed: ANIMATION_DURATION,
+                delay: 5000
+            };
+            utils.mixin(settings, options || {});
+            self.settings = settings;
             ListView.call(self, list, itemTemplate, CLASS_NAME.CAROUSEL);
             self.wrapper = new controls.Box();
             self.wrapper.addClass('carousel-wrapper');
@@ -578,41 +582,46 @@ any = (function () {
 
         Carousel.prototype = new ListView();
         Carousel.prototype.draw = function () {
-            var self = this, wrapper = self.wrapper, child, children, visibleCount, childWidth;
+            var self = this, wrapper = self.wrapper, child, children, slides, childWidth;
             children = self.children;
-            visibleCount = self.options.visibleCount;
-            childWidth = 100 / visibleCount;
-            for (var i = 0; i < visibleCount; i++) {
+            slides = self.settings.slides;
+            childWidth = 100 / slides;
+            for (var i = 0; i < slides; i++) {
                 child = children[i];
                 child.draw();
                 child.element.style.width = childWidth + '%';
                 wrapper.element.appendChild(child.element);
             }
             self.element.appendChild(wrapper.element);
-            self.next();
-        };
-        Carousel.prototype.slide = function (direction) {
-            var self = this, itemWidth, left, firstChild, children, element;
-            children = self.children;
-            firstChild = children[0];
-            // Workaround: Daddy will fix it.
+            /**
+             * Workaround: Daddy will fix it.
+             */
             setTimeout(function () {
-                //firstChild.addEventListener('ItemLoaded', function () {
-                element = firstChild.element;
-                itemWidth = element.clientWidth;
-                left = element.offsetLeft;
-                if (direction === DIRECTION.LEFT) {
-                    itemWidth = -itemWidth;
-                }
-                function move() {
-                    self.wrapper.moveTo(left += itemWidth, 0, ANIMATION_DURATION);
+                //child.addEventListener('ItemLoaded', function () {
+                for (var i = slides, l = children.length; i < l; i++) {
+                    child = children[2];
+                    child.draw();
+                    child.element.style.width = '300px';
+                    wrapper.element.appendChild(child.element);
                 }
 
                 setInterval(function () {
-                    move();
-                }, 5000);
+                    self.next();
+                }, self.settings.delay);
                 //});
             }, 1000);
+        };
+        Carousel.prototype.slide = function (direction) {
+            var self = this, itemWidth, x, children, element;
+            children = self.children;
+            element = children[0].element;
+            itemWidth = element.clientWidth;
+            x = element.offsetLeft;
+            if (direction === DIRECTION.LEFT) {
+                itemWidth = -itemWidth;
+            }
+            x += itemWidth;
+            self.wrapper.moveTo(x, 0, self.options.duration);
         };
         Carousel.prototype.prev = function () {
             this.slide(DIRECTION.RIGHT);
@@ -620,7 +629,6 @@ any = (function () {
         Carousel.prototype.next = function () {
             this.slide(DIRECTION.LEFT);
         };
-
 
         /**
          * Box

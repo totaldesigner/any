@@ -1,0 +1,10 @@
+.carousel-item {
+    background-color: #eeeeee;
+}
+.carousel-item > div {
+    padding: 5px;
+    height: 200px;
+}
+.carousel-item > div > a {
+    border: solid 3px #888888;
+}

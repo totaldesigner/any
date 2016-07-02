@@ -474,11 +474,6 @@ body {
 .any .carousel .carousel-wrapper .carousel-item {
   float: left;
   width: auto;
-  background-color: #eeeeee;
-}
-.any .carousel .carousel-wrapper .carousel-item > div {
-  padding: 10px;
-  border: solid 1px #cccccc;
 }
 .any .carousel .carousel-wrapper:after {
   content: "";
