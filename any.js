@@ -4,7 +4,7 @@
 /*jshint browser:true */
 'use strict';
 
-const CLASS_NAME = {
+var CLASS_NAME = {
     BOX: 'box',
     VIEW: 'view',
     ITEM: 'item',
@@ -20,11 +20,11 @@ const CLASS_NAME = {
     LAYER: 'layer',
     PAGE: 'page'
 };
-const DIRECTION = {
+var DIRECTION = {
     LEFT: 'left',
     RIGHT: 'right'
 };
-const ANIMATION_DURATION = 1000;
+var ANIMATION_DURATION = 1000;
 
 var any = any || {};
 any = (function () {
@@ -135,18 +135,6 @@ any = (function () {
         ItemUpdated.prototype = new Event();
 
         /**
-         * ItemLoaded
-         * @param sender
-         * @param args
-         * @constructor
-         */
-        function ItemLoaded(sender, args) {
-            Event.call(this, 'ItemLoaded', sender, args);
-        }
-
-        ItemLoaded.prototype = new Event();
-
-        /**
          * MenuItemSelected
          * @param sender
          * @param args
@@ -213,7 +201,6 @@ any = (function () {
             ItemAdded: ItemAdded,
             ItemRemoved: ItemRemoved,
             ItemUpdated: ItemUpdated,
-            ItemLoaded: ItemLoaded,
             MenuItemSelected: MenuItemSelected
         };
     })();
@@ -376,10 +363,14 @@ any = (function () {
                     duration: duration
                 });
             }
-            style = utils.format('translate3d({x}px, {y}px, {z}px)', {
+            //style = utils.format('translate3d({x}px, {y}px, {z}px)', {
+            //    x: x,
+            //    y: y,
+            //    z: 0
+            //});
+            style = utils.format('translate({x}px, {y}px)', {
                 x: x,
-                y: y,
-                z: 0
+                y: y
             });
             self.transit({
                 '-webkit-transform': style,
@@ -410,9 +401,6 @@ any = (function () {
             var self = this;
             Control.call(self, className || CLASS_NAME.ITEM, tagName);
             self.html = html;
-            self.element.addEventListener('load', function () {
-                self.dispatchEvent(new events.ItemLoaded(self, {}));
-            });
         }
 
         Item.prototype = new Control();
@@ -578,6 +566,7 @@ any = (function () {
             ListView.call(self, list, itemTemplate, CLASS_NAME.CAROUSEL);
             self.wrapper = new controls.Box();
             self.wrapper.addClass('carousel-wrapper');
+            self.currentIndex = 0;
         }
 
         Carousel.prototype = new ListView();
@@ -593,40 +582,40 @@ any = (function () {
                 wrapper.element.appendChild(child.element);
             }
             self.element.appendChild(wrapper.element);
-            /**
-             * Workaround: Daddy will fix it.
-             */
-            setTimeout(function () {
-                //child.addEventListener('ItemLoaded', function () {
-                for (var i = slides, l = children.length; i < l; i++) {
-                    child = children[2];
-                    child.draw();
-                    child.element.style.width = '300px';
-                    wrapper.element.appendChild(child.element);
-                }
-
-                setInterval(function () {
-                    self.next();
-                }, self.settings.delay);
-                //});
-            }, 1000);
+            setInterval(function () {
+                self.next();
+            }, self.settings.delay);
         };
         Carousel.prototype.slide = function (direction) {
-            var self = this, itemWidth, x, children, element;
+            var self = this, x = 0, children, wrapper = self.wrapper;
             children = self.children;
-            element = children[0].element;
-            itemWidth = element.clientWidth;
-            x = element.offsetLeft;
-            if (direction === DIRECTION.LEFT) {
-                itemWidth = -itemWidth;
+            var prev, next, childWidth;
+            if (children[self.currentIndex]) {
+                prev = children[self.currentIndex - 1];
+                next = children[self.currentIndex];
+                childWidth = prev.element.clientWidth;
+                x = self.currentIndex * childWidth;
+                x = direction === DIRECTION.LEFT ? -x : x;
+                if (children.length != wrapper.element.children.length) {
+                    prev.element.style.width = childWidth + 'px';
+                    next.element.style.width = childWidth + 'px';
+                    next.draw();
+                    wrapper.element.appendChild(next.element);
+                    wrapper.element.style.width = (childWidth * wrapper.element.children.length) + 'px';
+                }
+            } else {
+                self.currentIndex = 0;
             }
-            x += itemWidth;
-            self.wrapper.moveTo(x, 0, self.options.duration);
+            wrapper.moveTo(x, 0, self.settings.speed);
         };
         Carousel.prototype.prev = function () {
+            var self = this;
+            self.currentIndex -= 1;
             this.slide(DIRECTION.RIGHT);
         };
         Carousel.prototype.next = function () {
+            var self = this;
+            self.currentIndex += 1;
             this.slide(DIRECTION.LEFT);
         };
 
@@ -678,7 +667,7 @@ any = (function () {
         Page.prototype = new Control();
         Page.prototype.draw = function () {
             var self = this, body;
-            body = document.getElementsByTagName('body')[0];
+            body = document.body;
             body.className = 'any';
             body.addEventListener('keydown', self.onKeyDown);
             Control.prototype.draw.call(self);
