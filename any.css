@@ -460,6 +460,20 @@ body {
   display: block;
   clear: both;
 }
+.any .pagination {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.any .pagination .pagination-item {
+  float: left;
+  width: auto;
+}
+.any .pagination:after {
+  content: "";
+  display: block;
+  clear: both;
+}
 .any .context-menu {
   position: absolute;
 }

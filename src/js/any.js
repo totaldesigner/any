@@ -14,6 +14,8 @@ var CLASS_NAME = {
     MENU: 'menu',
     CONTEXT_MENU_ITEM: 'context-menu-item',
     CONTEXT_MENU: 'context-menu',
+    PAGINATION_ITEM: 'pagination-item',
+    PAGINATION: 'pagination',
     CAROUSEL_ITEM: 'carousel-item',
     CAROUSEL: 'carousel',
     LAYOUT: 'layout',
@@ -537,15 +539,41 @@ any = (function () {
 
         ContextMenu.prototype = new Menu();
 
+        function Navigation(prev, next) {
+            var self = this, prevItem, nextItem;
+            prevItem = new Item(prev);
+            nextItem = new Item(next);
+            prevItem.addClass('prev');
+            nextItem.addClass('next');
+            self.append(prevItem);
+            self.append(nextItem);
+            self.addClass('navigation');
+        }
+
+        Navigation.prototype = new Control();
+
         /**
          * Pagination
          * @constructor
          */
-        function Pagination() {
-
+        function Pagination(list, itemTemplate) {
+            var self = this;
+            ListView.call(self, list, itemTemplate, CLASS_NAME.PAGINATION);
         }
 
-        Pagination.prototype = new ListView();
+        Pagination.prototype = new Menu();
+        Pagination.prototype.draw = function () {
+            var self = this;
+            Menu.prototype.draw.call(self);
+            self.select(0);
+        };
+        Pagination.prototype.select = function (index) {
+            var self = this, items;
+            self.selectedIndex = index;
+            items = self.element.querySelectorAll('.' + CLASS_NAME.PAGINATION_ITEM + '.selected');
+            items.classList.remove('selected');
+            self.children[index].element.classList.add('selected');
+        };
 
         /**
          * Carousel
@@ -557,7 +585,7 @@ any = (function () {
         function Carousel(list, itemTemplate, options) {
             var self = this, settings;
             settings = {
-                slides: 1,
+                slides: 3,
                 speed: ANIMATION_DURATION,
                 delay: 5000
             };
@@ -571,7 +599,7 @@ any = (function () {
 
         Carousel.prototype = new ListView();
         Carousel.prototype.draw = function () {
-            var self = this, wrapper = self.wrapper, child, children, slides, childWidth;
+            var self = this, wrapper = self.wrapper, firstChild, child, children, slides, childWidth;
             children = self.children;
             slides = self.settings.slides;
             childWidth = 100 / slides;
@@ -582,41 +610,58 @@ any = (function () {
                 wrapper.element.appendChild(child.element);
             }
             self.element.appendChild(wrapper.element);
+            setTimeout(function() {
+                firstChild = children[0];
+                childWidth = firstChild.element.clientWidth;
+                for (var i = 0, l = children.length; i < l; i++) {
+                    child = children[i];
+                    child.element.style.width = childWidth + 'px';
+                    if (i >= slides) {
+                        child.draw();
+                        wrapper.element.appendChild(child.element);
+                    }
+                }
+                wrapper.element.style.width = (childWidth * wrapper.element.children.length) + 'px';
+            }, 0);
+            self.start();
+        };
+        Carousel.prototype.slide = function () {
+            var self = this, wrapper = self.wrapper;
+            wrapper.moveTo(self.getNewPosition(), 0, self.settings.speed);
+        };
+        Carousel.prototype.prev = function () {
+            this.slide(DIRECTION.RIGHT);
+        };
+        Carousel.prototype.next = function () {
+            this.slide(DIRECTION.LEFT);
+        };
+        Carousel.prototype.getNewPosition = function () {
+            var self = this, children, slides, currentIndex, maxIndex, newPosition, itemWidth;
+            children = self.children;
+            slides = self.settings.slides;
+            currentIndex = self.currentIndex;
+            maxIndex = children.length - slides;
+            if (currentIndex === maxIndex) {
+                currentIndex = 0;
+            } else {
+                currentIndex = currentIndex + slides;
+                if (currentIndex > maxIndex) {
+                    currentIndex = maxIndex;
+                }
+            }
+            itemWidth = children[0].element.clientWidth;
+            newPosition = (-itemWidth) * currentIndex;
+            self.currentIndex = currentIndex;
+            return newPosition;
+        };
+        Carousel.prototype.start = function () {
+            var self = this;
             setInterval(function () {
                 self.next();
             }, self.settings.delay);
         };
-        Carousel.prototype.slide = function (direction) {
-            var self = this, x = 0, children, wrapper = self.wrapper;
-            children = self.children;
-            var prev, next, childWidth;
-            if (children[self.currentIndex]) {
-                prev = children[self.currentIndex - 1];
-                next = children[self.currentIndex];
-                childWidth = prev.element.clientWidth;
-                x = self.currentIndex * childWidth;
-                x = direction === DIRECTION.LEFT ? -x : x;
-                if (children.length !== wrapper.element.children.length) {
-                    prev.element.style.width = childWidth + 'px';
-                    next.element.style.width = childWidth + 'px';
-                    next.draw();
-                    wrapper.element.appendChild(next.element);
-                    wrapper.element.style.width = (childWidth * wrapper.element.children.length) + 'px';
-                }
-            } else {
-                self.currentIndex = 0;
-            }
-            wrapper.moveTo(x, 0, self.settings.speed);
-        };
-        Carousel.prototype.prev = function () {
-            var self = this;
-            self.currentIndex -= 1;
-            this.slide(DIRECTION.RIGHT);
-        };
-        Carousel.prototype.next = function () {
-            var self = this;
-            self.currentIndex += 1;
-            this.slide(DIRECTION.LEFT);
+        Carousel.prototype.stop = function () {
+
         };
 
         /**
