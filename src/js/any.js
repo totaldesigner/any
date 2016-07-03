@@ -27,32 +27,7 @@ var ANIMATION_DURATION = 1000;
 
 var any = any || {};
 any = (function () {
-    var utils, events, collections, controls, animation, win;
-
-    animation = (function () {
-        if (animation) {
-            return animation;
-        }
-        else {
-            var transition, element = document.createElement('fake');
-            var transitions = {
-                transition: 'transitionend',
-                OTransition: 'oTransitionEnd',
-                MozTransition: 'transitionend',
-                WebkitTransition: 'webkitTransitionEnd'
-            };
-            for (transition in transitions) {
-                if (transitions.hasOwnProperty(transition)) {
-                    if (element.style.hasOwnProperty(transition)) {
-                        return {
-                            transition: transition,
-                            transitionEnd: transitions[transition]
-                        };
-                    }
-                }
-            }
-        }
-    })();
+    var utils, events, collections, controls, win;
 
     utils = (function () {
 
@@ -317,18 +292,25 @@ any = (function () {
             }
         };
         Control.prototype.transit = function (css, transition, complete) {
-            var self = this, element = self.element, classList = element.classList;
-            var transitions = ['-webkit-transition', '-moz-transition', '-o-transition', 'transition'];
+            var self = this, element, classList, transitions, transitionEnds;
+            element = self.element;
+            classList = element.classList;
+            transitions = ['-webkit-transition', '-moz-transition', '-o-transition', 'transition'];
+            transitionEnds = ['webkitTransitionEnd', 'transitionend', 'msTransitionEnd', 'oTransitionEnd'];
             if (transition) {
                 for (var i = 0; i < transitions.length; i++) {
                     element.style[transitions[i]] = transition;
                 }
             }
             if (complete) {
-                element.addEventListener(animation.transitionEnd, function () {
-                    element.removeEventListener(animation.transitionEnd);
-                    element.style[animation.transition] = '';
-                    complete();
+                transitionEnds.forEach(function (e) {
+                    var listener = function () {
+                        transitionEnds.forEach(function (e) {
+                            element.removeEventListener(e, listener);
+                        });
+                        complete();
+                    };
+                    self.element.addEventListener(e, listener, false);
                 });
             }
             setTimeout(function () {
@@ -369,11 +351,11 @@ any = (function () {
                 self.transit(css, transition, complete);
             }
         };
-        Control.prototype.moveTo = function (x, y, duration, complete) {
+        Control.prototype.moveTo = function (x, y, speed, complete) {
             var self = this, transition, style;
-            if (duration) {
-                transition = utils.format('all {duration}ms ease', {
-                    duration: duration
+            if (speed) {
+                transition = utils.format('all {speed}ms ease', {
+                    speed: speed
                 });
             }
             //style = utils.format('translate3d({x}px, {y}px, {z}px)', {
@@ -609,7 +591,7 @@ any = (function () {
             //win.addEventListener('WindowResizing', function(e) {
             //    self.onWindowResizing(e);
             //});
-            win.addEventListener('WindowResizeEnd', function(e) {
+            win.addEventListener('WindowResizeEnd', function (e) {
                 self.onWindowResizeEnd(e);
             });
         }
@@ -644,7 +626,9 @@ any = (function () {
         };
         Carousel.prototype.slide = function () {
             var self = this, wrapper = self.wrapper;
-            wrapper.moveTo(self.getNewPosition(), 0, self.settings.speed);
+            wrapper.moveTo(self.getNewPosition(), 0, self.settings.speed, function() {
+                console.log('transitionEnd');
+            });
         };
         Carousel.prototype.prev = function () {
             this.slide(DIRECTION.RIGHT);
@@ -683,7 +667,7 @@ any = (function () {
         //Carousel.prototype.onWindowResizing = function() {
         //    console.log('WindowResizing: ' + new Date());
         //};
-        Carousel.prototype.onWindowResizeEnd = function() {
+        Carousel.prototype.onWindowResizeEnd = function () {
             var self = this, child, children, slides, wrapper, width, childWidth;
             children = self.children;
             wrapper = self.wrapper;
