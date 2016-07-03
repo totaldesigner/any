@@ -20,10 +20,6 @@ var CLASS_NAME = {
     PAGE: 'page',
     SELECTED: 'selected'
 };
-var DIRECTION = {
-    LEFT: 'left',
-    RIGHT: 'right'
-};
 var ANIMATION_DURATION = 1000;
 
 var any = any || {};
@@ -652,16 +648,16 @@ any = (function () {
             pagination = new controls.Pagination(new collections.List(data), '<div><span></span></div>');
             pagination.addEventListener('MenuItemSelected', function (e) {
                 var args = e.args;
-                self.restart();
-                self.wrapper.moveTo(self.getNewPosition(args.index), 0, self.settings.speed);
+                self.slide(args.index);
             });
             pagination.draw();
             self.element.appendChild(pagination.element);
             self.pagination = pagination;
         };
-        Carousel.prototype.slide = function () {
+        Carousel.prototype.slide = function (slideIndex) {
             var self = this, wrapper = self.wrapper;
-            wrapper.moveTo(self.getNewPosition(), 0, self.settings.speed, function () {
+            self.restart();
+            wrapper.moveTo(self.getNewPosition(slideIndex), 0, self.settings.speed, function () {
                 if (self.pagination) {
                     self.pagination.select(self.getCurrentSlideIndex(), true);
                 }
@@ -674,32 +670,27 @@ any = (function () {
             });
         };
         Carousel.prototype.prev = function () {
-            this.slide(DIRECTION.RIGHT);
+            var self = this;
+            this.slide(self.getCurrentSlideIndex() - 1);
         };
         Carousel.prototype.next = function () {
-            this.slide(DIRECTION.LEFT);
+            var self = this;
+            this.slide(self.getCurrentSlideIndex() + 1);
         };
         Carousel.prototype.getCurrentSlideIndex = function () {
             var self = this;
-            return Math.floor(self.currentIndex / self.settings.visibleItems);
+            return Math.ceil(self.currentIndex / self.settings.visibleItems);
         };
         Carousel.prototype.getNewPosition = function (slideIndex) {
             var self = this, children, visibleItems, currentIndex, maxIndex, newPosition, itemWidth;
             children = self.children;
             visibleItems = self.settings.visibleItems;
             maxIndex = children.length - visibleItems;
-            if (typeof(slideIndex) === 'undefined') {
-                currentIndex = self.currentIndex;
-                if (currentIndex === maxIndex) {
-                    currentIndex = 0;
-                } else {
-                    currentIndex = currentIndex + visibleItems;
-                    if (currentIndex > maxIndex) {
-                        currentIndex = maxIndex;
-                    }
-                }
+            if (slideIndex < 0) {
+                currentIndex = maxIndex;
             } else {
-                currentIndex = Math.min(slideIndex * visibleItems, maxIndex);
+                currentIndex = slideIndex * visibleItems;
+                currentIndex = Math.min(currentIndex > children.length ? 0 : currentIndex, maxIndex);
             }
             itemWidth = children[0].element.clientWidth;
             newPosition = (-itemWidth) * currentIndex;
