@@ -7,18 +7,38 @@ The easiest responsive front-end framework for web development
 git clone https://github.com/totaldesigner/any
 npm install
 bower install
+or
+bower install anyjs
 ```
 
 ## Usage
 ``` shell
 gulp build
 ```
-
-## Bower
-* Registering a package
-``` shell
-bower register anyjs https://github.com/totaldesigner/any.git  
+``` html
+<link rel="stylesheet" href="any.css"/>
+<script src="any.js"></script>
 ```
+``` script
+var controls, collections, page, layer, box, carousel, list;
+controls = any.controls;
+collections = any.collections;
+page = new controls.Page();
+layer = new controls.Layer();
+box = new controls.Box();
+list = new collections.List([{
+    key: 1
+}, {
+    key: 2
+}]);
+carousel = new controls.Carousel(list, '<div><a>{key}</a></div>');
+box.append(carousel);
+layer.append(box);
+page.append(layer);
+page.draw();
+```
+
+## Tagging
 * Updating and maintenance
 ``` shell
 git tag -a v0.0.1 -m "Release version 0.0.1"

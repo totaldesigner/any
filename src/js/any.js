@@ -661,12 +661,12 @@ any = (function () {
                 if (self.pagination) {
                     self.pagination.select(self.getCurrentSlideIndex(), true);
                 }
-                if (self.delayedTask) {
-                    setTimeout(function () {
+                setTimeout(function () {
+                    if (self.delayedTask) {
                         self.delayedTask();
                         self.delayedTask = null;
-                    }, 0);
-                }
+                    }
+                }, 0);
             });
         };
         Carousel.prototype.prev = function () {
