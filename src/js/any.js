@@ -521,7 +521,7 @@ any = (function () {
                 var index, c = child;
                 (function click() {
                     index = self.getNodeIndex(c);
-                    self.select(index, true);
+                    self.select(index);
                     self.dispatchEvent(new events.MenuItemSelected(self, {
                         index: index,
                         item: self.children[index]
@@ -642,7 +642,7 @@ any = (function () {
             var self = this, children, visibleItems, slides, pagination, data;
             visibleItems = self.settings.visibleItems;
             children = self.children;
-            slides = Math.floor(children.length / visibleItems);
+            slides = Math.ceil(children.length / visibleItems);
             data = [];
             for (var i = 0; i < slides; i++) {
                 data.push({
@@ -652,6 +652,7 @@ any = (function () {
             pagination = new controls.Pagination(new collections.List(data), '<div><span></span></div>');
             pagination.addEventListener('MenuItemSelected', function (e) {
                 var args = e.args;
+                self.restart();
                 self.wrapper.moveTo(self.getNewPosition(args.index), 0, self.settings.speed);
             });
             pagination.draw();
@@ -682,23 +683,23 @@ any = (function () {
             var self = this;
             return Math.floor(self.currentIndex / self.settings.visibleItems);
         };
-        Carousel.prototype.getNewPosition = function (newIndex) {
+        Carousel.prototype.getNewPosition = function (slideIndex) {
             var self = this, children, visibleItems, currentIndex, maxIndex, newPosition, itemWidth;
             children = self.children;
             visibleItems = self.settings.visibleItems;
-            if (typeof(newIndex) === 'undefined') {
-                currentIndex = self.currentIndex;
-            } else {
-                currentIndex = newIndex;
-            }
             maxIndex = children.length - visibleItems;
-            if (currentIndex === maxIndex) {
-                currentIndex = 0;
-            } else {
-                currentIndex = currentIndex + visibleItems;
-                if (currentIndex > maxIndex) {
-                    currentIndex = maxIndex;
+            if (typeof(slideIndex) === 'undefined') {
+                currentIndex = self.currentIndex;
+                if (currentIndex === maxIndex) {
+                    currentIndex = 0;
+                } else {
+                    currentIndex = currentIndex + visibleItems;
+                    if (currentIndex > maxIndex) {
+                        currentIndex = maxIndex;
+                    }
                 }
+            } else {
+                currentIndex = Math.min(slideIndex * visibleItems, maxIndex);
             }
             itemWidth = children[0].element.clientWidth;
             newPosition = (-itemWidth) * currentIndex;
@@ -713,6 +714,11 @@ any = (function () {
         };
         Carousel.prototype.stop = function () {
             clearInterval(this.slideTimer);
+        };
+        Carousel.prototype.restart = function () {
+            var self = this;
+            self.stop();
+            self.start();
         };
         //Carousel.prototype.onWindowResizing = function() {
         //    console.log('WindowResizing: ' + new Date());
