@@ -17,7 +17,8 @@ var CLASS_NAME = {
     CAROUSEL: 'carousel',
     LAYOUT: 'layout',
     LAYER: 'layer',
-    PAGE: 'page'
+    PAGE: 'page',
+    SELECTED: 'selected'
 };
 var DIRECTION = {
     LEFT: 'left',
@@ -499,6 +500,7 @@ any = (function () {
          */
         function Menu(list, itemTemplate) {
             var self = this;
+            self.selectedIndex = 0;
             ListView.call(self, list, itemTemplate, CLASS_NAME.MENU);
         }
 
@@ -509,20 +511,35 @@ any = (function () {
             children = self.element.querySelectorAll('.' + self.className + '-item');
             for (var i = 0, l = children.length; i < l; i++) {
                 child = children[i];
-                self.onMenuItemSelected(child);
+                self.addClickEvent(child);
             }
+            children[0].classList.add(CLASS_NAME.SELECTED);
         };
-        Menu.prototype.onMenuItemSelected = function (child) {
+        Menu.prototype.addClickEvent = function (child) {
             var self = this;
-            child.addEventListener('click', function (e) {
-                var target, index;
-                target = e.target || e.srcElement;
-                index = self.getNodeIndex(target);
-                self.dispatchEvent(new events.MenuItemSelected(self, {
-                    index: index,
-                    item: self.children[index]
-                }));
+            child.addEventListener('click', function () {
+                var index, c = child;
+                (function click() {
+                    index = self.getNodeIndex(c);
+                    self.select(index, true);
+                    self.dispatchEvent(new events.MenuItemSelected(self, {
+                        index: index,
+                        item: self.children[index]
+                    }));
+                })();
             });
+        };
+        Menu.prototype.select = function (index, prevent) {
+            var self = this, selected;
+            selected = self.element.querySelector('.' + CLASS_NAME.SELECTED);
+            if (selected) {
+                selected.classList.remove(CLASS_NAME.SELECTED);
+            }
+            self.children[index].element.classList.add(CLASS_NAME.SELECTED);
+            self.selectedIndex = index;
+            if (!prevent) {
+                self.children[index].element.click();
+            }
         };
 
         /**
@@ -561,14 +578,6 @@ any = (function () {
         Pagination.prototype.draw = function () {
             var self = this;
             Menu.prototype.draw.call(self);
-            self.select(0);
-        };
-        Pagination.prototype.select = function (index) {
-            var self = this, items;
-            self.selectedIndex = index;
-            items = self.element.querySelectorAll('.' + CLASS_NAME.PAGINATION_ITEM + '.selected');
-            items.classList.remove('selected');
-            self.children[index].element.classList.add('selected');
         };
 
         /**
@@ -581,9 +590,10 @@ any = (function () {
         function Carousel(list, itemTemplate, options) {
             var self = this, settings;
             settings = {
-                slides: 3,
+                visibleItems: 3,
                 speed: ANIMATION_DURATION,
-                delay: 5000
+                delay: 5000,
+                pagination: true
             };
             utils.mixin(settings, options || {});
             self.settings = settings;
@@ -598,11 +608,12 @@ any = (function () {
 
         Carousel.prototype = new ListView();
         Carousel.prototype.draw = function () {
-            var self = this, wrapper = self.wrapper, firstChild, child, children, slides, childWidth;
+            var self = this, wrapper, firstChild, child, children, visibleItems, childWidth;
+            wrapper = self.wrapper;
             children = self.children;
-            slides = self.settings.slides;
-            childWidth = 100 / slides;
-            for (var i = 0; i < slides; i++) {
+            visibleItems = self.settings.visibleItems;
+            childWidth = 100 / visibleItems;
+            for (var i = 0; i < visibleItems; i++) {
                 child = children[i];
                 child.draw();
                 child.element.style.width = childWidth + '%';
@@ -616,17 +627,43 @@ any = (function () {
                 for (var i = 0, l = children.length; i < l; i++) {
                     child = children[i];
                     child.element.style.width = childWidth + 'px';
-                    if (i >= slides) {
+                    if (i >= visibleItems) {
                         child.draw();
                         wrapper.element.appendChild(child.element);
                     }
                 }
+                if (self.settings.pagination) {
+                    self.createPagination();
+                }
             }, 0);
             self.start();
+        };
+        Carousel.prototype.createPagination = function () {
+            var self = this, children, visibleItems, slides, pagination, data;
+            visibleItems = self.settings.visibleItems;
+            children = self.children;
+            slides = Math.floor(children.length / visibleItems);
+            data = [];
+            for (var i = 0; i < slides; i++) {
+                data.push({
+                    index: i
+                });
+            }
+            pagination = new controls.Pagination(new collections.List(data), '<div><span></span></div>');
+            pagination.addEventListener('MenuItemSelected', function (e) {
+                var args = e.args;
+                self.wrapper.moveTo(self.getNewPosition(args.index), 0, self.settings.speed);
+            });
+            pagination.draw();
+            self.element.appendChild(pagination.element);
+            self.pagination = pagination;
         };
         Carousel.prototype.slide = function () {
             var self = this, wrapper = self.wrapper;
             wrapper.moveTo(self.getNewPosition(), 0, self.settings.speed, function () {
+                if (self.pagination) {
+                    self.pagination.select(self.getCurrentSlideIndex(), true);
+                }
                 if (self.delayedTask) {
                     setTimeout(function () {
                         self.delayedTask();
@@ -641,16 +678,24 @@ any = (function () {
         Carousel.prototype.next = function () {
             this.slide(DIRECTION.LEFT);
         };
-        Carousel.prototype.getNewPosition = function () {
-            var self = this, children, slides, currentIndex, maxIndex, newPosition, itemWidth;
+        Carousel.prototype.getCurrentSlideIndex = function () {
+            var self = this;
+            return Math.floor(self.currentIndex / self.settings.visibleItems);
+        };
+        Carousel.prototype.getNewPosition = function (newIndex) {
+            var self = this, children, visibleItems, currentIndex, maxIndex, newPosition, itemWidth;
             children = self.children;
-            slides = self.settings.slides;
-            currentIndex = self.currentIndex;
-            maxIndex = children.length - slides;
+            visibleItems = self.settings.visibleItems;
+            if (typeof(newIndex) === 'undefined') {
+                currentIndex = self.currentIndex;
+            } else {
+                currentIndex = newIndex;
+            }
+            maxIndex = children.length - visibleItems;
             if (currentIndex === maxIndex) {
                 currentIndex = 0;
             } else {
-                currentIndex = currentIndex + slides;
+                currentIndex = currentIndex + visibleItems;
                 if (currentIndex > maxIndex) {
                     currentIndex = maxIndex;
                 }
@@ -662,26 +707,26 @@ any = (function () {
         };
         Carousel.prototype.start = function () {
             var self = this;
-            setInterval(function () {
+            self.slideTimer = setInterval(function () {
                 self.next();
             }, self.settings.delay);
         };
         Carousel.prototype.stop = function () {
-
+            clearInterval(this.slideTimer);
         };
         //Carousel.prototype.onWindowResizing = function() {
         //    console.log('WindowResizing: ' + new Date());
         //};
         Carousel.prototype.onWindowResizeEnd = function () {
-            var self = this, child, children, slides, wrapper, width, childWidth;
+            var self = this, child, children, visibleItems, wrapper, width, childWidth;
             children = self.children;
             wrapper = self.wrapper;
             if (wrapper.transitioning) {
                 self.delayedTask = self.onWindowResizeEnd;
             } else {
-                slides = self.settings.slides;
+                visibleItems = self.settings.visibleItems;
                 width = self.element.clientWidth;
-                childWidth = width / slides;
+                childWidth = width / visibleItems;
                 wrapper.element.style.width = (childWidth * children.length) + 'px';
                 for (var i = 0, l = children.length; i < l; i++) {
                     child = children[i];
@@ -717,7 +762,7 @@ any = (function () {
         Layer.prototype = new Control();
 
         /**
-         * Dialog
+         * Dialog = self.wrapper
          * @constructor
          */
         function Dialog() {
@@ -791,6 +836,7 @@ any = (function () {
             Carousel: Carousel,
             ContextMenu: ContextMenu,
             Pagination: Pagination,
+            Navigation: Navigation,
             Layer: Layer,
             Dialog: Dialog,
             Page: Page,
