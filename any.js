@@ -689,7 +689,8 @@ any = (function () {
             if (slideIndex < 0) {
                 currentIndex = maxIndex;
             } else {
-                currentIndex = Math.min(slideIndex * visibleItems, maxIndex);
+                currentIndex = slideIndex * visibleItems;
+                currentIndex = Math.min(currentIndex > children.length ? 0 : currentIndex, maxIndex);
             }
             itemWidth = children[0].element.clientWidth;
             newPosition = (-itemWidth) * currentIndex;
