@@ -263,6 +263,7 @@ any = (function () {
             self.element = element;
             self.children = [];
             self.html = null;
+            self.transitioning = false;
         }
 
         utils.mixin(Control.prototype, events.EventTarget.prototype);
@@ -298,20 +299,22 @@ any = (function () {
             transitions = ['-webkit-transition', '-moz-transition', '-o-transition', 'transition'];
             transitionEnds = ['webkitTransitionEnd', 'transitionend', 'msTransitionEnd', 'oTransitionEnd'];
             if (transition) {
+                self.transitioning = true;
                 for (var i = 0; i < transitions.length; i++) {
                     element.style[transitions[i]] = transition;
                 }
-            }
-            if (complete) {
-                transitionEnds.forEach(function (e) {
-                    var listener = function () {
-                        transitionEnds.forEach(function (e) {
-                            element.removeEventListener(e, listener);
-                        });
-                        complete();
-                    };
-                    self.element.addEventListener(e, listener, false);
-                });
+                if (complete) {
+                    transitionEnds.forEach(function (e) {
+                        var listener = function () {
+                            transitionEnds.forEach(function (e) {
+                                element.removeEventListener(e, listener);
+                            });
+                            self.transitioning = false;
+                            complete();
+                        };
+                        self.element.addEventListener(e, listener, false);
+                    });
+                }
             }
             setTimeout(function () {
                 if (css instanceof String) {
@@ -588,9 +591,6 @@ any = (function () {
             self.wrapper = new controls.Box();
             self.wrapper.addClass('carousel-wrapper');
             self.currentIndex = 0;
-            //win.addEventListener('WindowResizing', function(e) {
-            //    self.onWindowResizing(e);
-            //});
             win.addEventListener('WindowResizeEnd', function (e) {
                 self.onWindowResizeEnd(e);
             });
@@ -612,6 +612,7 @@ any = (function () {
             setTimeout(function () {
                 firstChild = children[0];
                 childWidth = firstChild.element.clientWidth;
+                wrapper.element.style.width = (childWidth * children.length) + 'px';
                 for (var i = 0, l = children.length; i < l; i++) {
                     child = children[i];
                     child.element.style.width = childWidth + 'px';
@@ -620,14 +621,18 @@ any = (function () {
                         wrapper.element.appendChild(child.element);
                     }
                 }
-                wrapper.element.style.width = (childWidth * wrapper.element.children.length) + 'px';
             }, 0);
             self.start();
         };
         Carousel.prototype.slide = function () {
             var self = this, wrapper = self.wrapper;
-            wrapper.moveTo(self.getNewPosition(), 0, self.settings.speed, function() {
-                console.log('transitionEnd');
+            wrapper.moveTo(self.getNewPosition(), 0, self.settings.speed, function () {
+                if (self.delayedTask) {
+                    setTimeout(function () {
+                        self.delayedTask();
+                        self.delayedTask = null;
+                    }, 0);
+                }
             });
         };
         Carousel.prototype.prev = function () {
@@ -671,13 +676,17 @@ any = (function () {
             var self = this, child, children, slides, wrapper, width, childWidth;
             children = self.children;
             wrapper = self.wrapper;
-            slides = self.settings.slides;
-            width = self.element.clientWidth;
-            childWidth = width / slides;
-            wrapper.element.style.width = (childWidth * children.length) + 'px';
-            for (var i = 0, l = children.length; i < l; i++) {
-                child = children[i];
-                child.element.style.width = childWidth + 'px';
+            if (wrapper.transitioning) {
+                self.delayedTask = self.onWindowResizeEnd;
+            } else {
+                slides = self.settings.slides;
+                width = self.element.clientWidth;
+                childWidth = width / slides;
+                wrapper.element.style.width = (childWidth * children.length) + 'px';
+                for (var i = 0, l = children.length; i < l; i++) {
+                    child = children[i];
+                    child.element.style.width = childWidth + 'px';
+                }
             }
         };
 
