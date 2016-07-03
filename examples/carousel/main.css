@@ -7,4 +7,6 @@
 }
 .carousel-item > div > a {
     border: solid 3px #888888;
+    height: 190px;
+    font-size: 30px;
 }

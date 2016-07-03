@@ -627,7 +627,7 @@ any = (function () {
         Carousel.prototype.slide = function () {
             var self = this, wrapper = self.wrapper;
             wrapper.moveTo(self.getNewPosition(), 0, self.settings.speed, function() {
-                console.log('adsfasfasfasdfas');
+                console.log('transitionEnd');
             });
         };
         Carousel.prototype.prev = function () {

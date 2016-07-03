@@ -15,6 +15,16 @@ window.addEventListener('load', function() {
         key: 4
     }, {
         key: 5
+    }, {
+        key: 6
+    }, {
+        key: 7
+    }, {
+        key: 8
+    }, {
+        key: 9
+    }, {
+        key: 10
     }]);
     carousel = new controls.Carousel(list, '<div><a>{key}</a></div>');
     box.append(carousel);
