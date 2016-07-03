@@ -1,6 +1,3 @@
-/**
- * Created by mspark on 16. 6. 26.
- */
 /*jshint browser:true */
 /*globals any:false */
 

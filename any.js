@@ -1,6 +1,3 @@
-/**
- * Created by mspark on 6/22/16.
- */
 /*jshint browser:true */
 'use strict';
 
@@ -30,7 +27,7 @@ var ANIMATION_DURATION = 1000;
 
 var any = any || {};
 any = (function () {
-    var utils, events, collections, controls, animation;
+    var utils, events, collections, controls, animation, win;
 
     animation = (function () {
         if (animation) {
@@ -99,6 +96,18 @@ any = (function () {
             self.sender = sender;
             self.args = args;
         }
+
+        function WindowResizing(sender, args) {
+            Event.call(this, 'WindowResizing', sender, args);
+        }
+
+        WindowResizing.prototype = new Event();
+
+        function WindowResizeEnd(sender, args) {
+            Event.call(this, 'WindowResizeEnd', sender, args);
+        }
+
+        WindowResizeEnd.prototype = new Event();
 
         /**
          * ItemAdded
@@ -203,7 +212,9 @@ any = (function () {
             ItemAdded: ItemAdded,
             ItemRemoved: ItemRemoved,
             ItemUpdated: ItemUpdated,
-            MenuItemSelected: MenuItemSelected
+            MenuItemSelected: MenuItemSelected,
+            WindowResizing: WindowResizing,
+            WindowResizeEnd: WindowResizeEnd
         };
     })();
 
@@ -595,6 +606,12 @@ any = (function () {
             self.wrapper = new controls.Box();
             self.wrapper.addClass('carousel-wrapper');
             self.currentIndex = 0;
+            //win.addEventListener('WindowResizing', function(e) {
+            //    self.onWindowResizing(e);
+            //});
+            win.addEventListener('WindowResizeEnd', function(e) {
+                self.onWindowResizeEnd(e);
+            });
         }
 
         Carousel.prototype = new ListView();
@@ -610,10 +627,9 @@ any = (function () {
                 wrapper.element.appendChild(child.element);
             }
             self.element.appendChild(wrapper.element);
-            setTimeout(function() {
+            setTimeout(function () {
                 firstChild = children[0];
                 childWidth = firstChild.element.clientWidth;
-                wrapper.element.style.width = (childWidth * wrapper.element.children.length) + 'px';
                 for (var i = 0, l = children.length; i < l; i++) {
                     child = children[i];
                     child.element.style.width = childWidth + 'px';
@@ -622,39 +638,12 @@ any = (function () {
                         wrapper.element.appendChild(child.element);
                     }
                 }
+                wrapper.element.style.width = (childWidth * wrapper.element.children.length) + 'px';
             }, 0);
             self.start();
         };
         Carousel.prototype.slide = function () {
             var self = this, wrapper = self.wrapper;
-            //children = self.children, itemWidth;
-            //    slides = self.settings.slides;
-            //    x = 0, children,
-            //children = self.children;
-            //var prev, next, childWidth;
-            //if (children[self.currentIndex]) {
-            //    prev = children[self.currentIndex - slides];
-            //    next = children[self.currentIndex];
-            //    childWidth = prev.element.clientWidth;
-            //    x = self.currentIndex * childWidth;
-            //    x = direction === DIRECTION.LEFT ? -x : x;
-            //    if (children.length !== wrapper.element.children.length) {
-            //        prev.element.style.width = childWidth + 'px';
-            //        next.element.style.width = childWidth + 'px';
-            //        next.draw();
-            //        wrapper.element.appendChild(next.element);
-            //        wrapper.element.style.width = (childWidth * wrapper.element.children.length) + 'px';
-            //    }
-            //} else {
-            //    self.currentIndex = 0;
-            //if (children.length !== wrapper.element.children.length) {
-            //    itemWidth = children[0].element.clientWidth;
-            //    prev.element.style.width = itemWidth + 'px';
-            //    next.element.style.width = itemWidth + 'px';
-            //    next.draw();
-            //    wrapper.element.appendChild(next.element);
-            //    wrapper.element.style.width = (itemWidth * wrapper.element.children.length) + 'px';
-            //}
             wrapper.moveTo(self.getNewPosition(), 0, self.settings.speed);
         };
         Carousel.prototype.prev = function () {
@@ -690,6 +679,22 @@ any = (function () {
         };
         Carousel.prototype.stop = function () {
 
+        };
+        //Carousel.prototype.onWindowResizing = function() {
+        //    console.log('WindowResizing: ' + new Date());
+        //};
+        Carousel.prototype.onWindowResizeEnd = function() {
+            var self = this, child, children, slides, wrapper, width, childWidth;
+            children = self.children;
+            wrapper = self.wrapper;
+            slides = self.settings.slides;
+            width = self.element.clientWidth;
+            childWidth = width / slides;
+            for (var i = 0, l = children.length; i < l; i++) {
+                child = children[i];
+                child.element.style.width = childWidth + 'px';
+            }
+            wrapper.element.style.width = (childWidth * children.length) + 'px';
         };
 
         /**
@@ -772,6 +777,19 @@ any = (function () {
             }
         };
 
+        function Window() {
+            var self = this;
+            window.addEventListener('resize', function () {
+                clearTimeout(window.resizeEnd);
+                window.resizeEnd = setTimeout(function () {
+                    self.dispatchEvent(new events.WindowResizeEnd(self));
+                }, 200);
+                self.dispatchEvent(new events.WindowResizing(self));
+            }, false);
+        }
+
+        Window.prototype = new Control();
+
         return {
             Item: Item,
             Box: Box,
@@ -782,9 +800,12 @@ any = (function () {
             Pagination: Pagination,
             Layer: Layer,
             Dialog: Dialog,
-            Page: Page
+            Page: Page,
+            Window: Window
         };
     })();
+
+    win = new controls.Window();
 
     return {
         utils: utils,
